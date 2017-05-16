@@ -1,9 +1,17 @@
 {
-	"title": "UAPI Framework Tutorial",
-
-	"links": {
-		"sidebar": {
-			"Project @Github": "https://github.com/Inactionware"
-		}
-	}
+    "title": "UAPI Framework Tutorial",
+    "description": "A tutorial about UAPI framework",
+    "generator": "site",
+    "links": {
+        "sidebar": {
+            "Project @Github": "https://github.com/Inactionware"
+        }
+    },
+    "plugins": [
+        "disqus",
+        "anchors",
+        "comscore",
+        "multipart",
+        "codeblock-filename"
+    ]
 }
