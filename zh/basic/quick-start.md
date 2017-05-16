@@ -98,7 +98,7 @@ java -cp [class path] uapi.app.Bootstrap -config=[config file path]
 
 > 注意：profile不是必须要提供的，如果没有指定profile，则UAPI则会激活一个默认的profile，该默认profile会加载所有的service。
 
-# UAPI版本的Hello World
+# UAPI版本的HelloWorld
 上面例子是通过Service的生命周期回调方法来输出Hello World到日志的，当然这是允许的，但这并不是UAPI框架推荐的方式。
 
 在开发应用的时候，我们通常会对应用进行领域建模，会得到领域对象，进而规划出这些领域对象会有哪些功能，所以UAPI也使用这种方式。
