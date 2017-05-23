@@ -59,43 +59,73 @@ public class Terminator {
     protected IResponsibleRegistry _respReg;
 
     @Inject
-    protected IEventBus _eventBus;
+    protected ILogger _logger;
 
     @OnActivate
     public void activate() {
         IResponsible resp = this._respReg.register("Terminator");
         resp.newBehavior("Do Something", AppStartupEvent.class, AppStartupEvent.TOPIC)
-                .then(TerminateApp.actionId)
-                .traceable(true)
+                .then(StartUp.actionId)
+                .onSuccess((input, ctx) -> new ExitSystemRequest("Terminator"))
                 .build();
-        BehaviorFinishedEventHandler finHandler = (event) -> new ExitSystemRequest("Terminator");
-        resp.on(finHandler);
+        resp.newBehavior("Shutdown flow", AppShutdownEvent.class, AppShutdownEvent.TOPIC)
+                .then(CleanUp.actionId)
+                .build();
+    }
+
+    @OnDeactivate
+    public void deactivate() {
+        this._logger.info("The service is deactivated - {}", Terminator.class.getName());
     }
 
     @Service
     @Action
     @Tag("Terminator")
-    public static class TerminateApp {
+    public static class StartUp {
 
-        private static final ActionIdentify actionId = ActionIdentify.toActionId(TerminateApp.class);
+        private static final ActionIdentify actionId = ActionIdentify.toActionId(StartUp.class);
+
+        @Inject
+        protected ILogger _logger;
 
         @ActionDo
-        public boolean doSomething(AppStartupEvent event) throws Exception {
+        public void doSomething(AppStartupEvent event) throws Exception {
+            this._logger.info("Do start up action");
             Thread.sleep(1000);
-            return true;
+        }
+    }
+
+    @Service
+    @Action
+    @Tag("Terminator")
+    public static class CleanUp {
+
+        private static final ActionIdentify actionId = ActionIdentify.toActionId(CleanUp.class);
+
+        @Inject
+        protected ILogger _logger;
+
+        @ActionDo
+        public void cleanUp(AppShutdownEvent event) {
+            this._logger.info("Do clean up action");
         }
     }
 }
 ```
-该代码当应用启动后，会调用TerminateApp的Action，该Action会让现成睡眠一秒钟，然后Responsible接收到该Behavior处理结束通知，此时该Responsible向系统发出了退出应用的请求的事件，当UAPI接收到该事件后启动退出系统的动作。
+该代码当应用启动后，会调用StartUp的Action，该Action会输出一行日志，然后让线程睡眠一秒钟，然后当该Behavior处理结束后会发送ExitSystemRequest的请求，当UAPI接收到该请求后启动退出系统的动作。
+退出动作首先会发送AppShutdownEvent，所有需要清理资源的Responsible都需要定义相应的Behavior来处理资源清理的过程，当所有的资源清理的Behavior都执行完毕后，UAPI框架会调用所有Service的OnDeactivate注解标注的方法。
 
 上述代码执行的输出：
 ```
-16:06:24.550 [ForkJoinPool.commonPool-worker-1] INFO  u.c.internal.FileBasedConfigProvider - Config update cli.config -> conf/terminate-app-config.yaml
-16:06:24.597 [ForkJoinPool.commonPool-worker-1] INFO  u.c.internal.FileBasedConfigProvider - Config path is conf/terminate-app-config.yaml
-16:06:24.628 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.ProfileManager - Active profile is - TerminateAppProfile
-16:06:24.628 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.StartupApplication - The application is launched
-16:06:25.629 [ForkJoinPool-1-worker-0] DEBUG u.a.internal.ApplicationConstructor - Application is going to shutdown
+10:36:55.875 [ForkJoinPool.commonPool-worker-1] INFO  u.c.internal.FileBasedConfigProvider - Config update cli.config -> conf/terminate-app-config.yaml
+10:36:55.937 [ForkJoinPool.commonPool-worker-1] INFO  u.c.internal.FileBasedConfigProvider - Config path is conf/terminate-app-config.yaml
+10:36:55.953 [ForkJoinPool-1-worker-1] INFO  u.a.i.ApplicationConstructor$StartupApplication - Application is going to startup...
+10:36:55.953 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.ProfileManager - Active profile is - TerminateAppProfile
+10:36:55.969 [ForkJoinPool-1-worker-1] INFO  u.a.i.ApplicationConstructor$StartupApplication - The application is launched
+10:36:55.969 [ForkJoinPool-1-worker-1] INFO  u.a.internal.ApplicationConstructor - Application startup success.
+10:36:55.969 [ForkJoinPool-1-worker-1] INFO  uapi.tutorial.app.Terminator$StartUp - Do start up action
+10:36:56.975 [ForkJoinPool-1-worker-1] INFO  u.a.internal.ApplicationConstructor - Application is going to shutdown...
+10:36:56.975 [ForkJoinPool-1-worker-2] INFO  uapi.tutorial.app.Terminator$CleanUp - Do clean up action
 
 Process finished with exit code 0
 ```
