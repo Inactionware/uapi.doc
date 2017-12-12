@@ -7,7 +7,8 @@
 * [服务依赖](basic/service.md)
 * [服务Profile](basic/profile.md)
 * [服务配置](basic/config.md)
-* [事件驱动行为框架](basic/event-behavior.md)
+* [事件](basic/event.md)
+* [行为框架](basic/behavior.md)
 
 ## 第二部分 进阶
 * [概述](advance/README.md)
