@@ -117,19 +117,24 @@ public class Terminator {
 
 上述代码执行的输出：
 ```
-10:36:55.875 [ForkJoinPool.commonPool-worker-1] INFO  u.c.internal.FileBasedConfigProvider - Config update cli.config -> conf/terminate-app-config.yaml
-10:36:55.937 [ForkJoinPool.commonPool-worker-1] INFO  u.c.internal.FileBasedConfigProvider - Config path is conf/terminate-app-config.yaml
-10:36:55.953 [ForkJoinPool-1-worker-1] INFO  u.a.i.ApplicationConstructor$StartupApplication - Application is going to startup...
-10:36:55.953 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.ProfileManager - Active profile is - TerminateAppProfile
-10:36:55.969 [ForkJoinPool-1-worker-1] INFO  u.a.i.ApplicationConstructor$StartupApplication - The application is launched
-10:36:55.969 [ForkJoinPool-1-worker-1] INFO  u.a.internal.ApplicationConstructor - Application startup success.
-10:36:55.969 [ForkJoinPool-1-worker-1] INFO  uapi.tutorial.app.Terminator$StartUp - Do start up action
-10:36:56.975 [ForkJoinPool-1-worker-1] INFO  u.a.internal.ApplicationConstructor - Application is going to shutdown...
-10:36:56.975 [ForkJoinPool-1-worker-2] INFO  uapi.tutorial.app.Terminator$CleanUp - Do clean up action
+17:27:54.916 [ForkJoinPool.commonPool-worker-1] INFO  u.c.internal.FileBasedConfigProvider - Config update system.config -> conf/terminate-app-config.yaml
+17:27:54.961 [ForkJoinPool.commonPool-worker-1] INFO  u.c.internal.FileBasedConfigProvider - Config path is conf/terminate-app-config.yaml
+17:27:54.982 [ForkJoinPool-1-worker-1] INFO  u.a.i.Application$StartupApplication - Application is going to startup...
+17:27:54.982 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.ProfileManager - Active profile is - TerminateAppProfile
+17:27:54.988 [ForkJoinPool-1-worker-1] INFO  u.a.i.Application$StartupApplication - The application is launched
+17:27:54.988 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.Application - Application startup success.
+17:27:54.988 [ForkJoinPool-1-worker-1] INFO  uapi.tutorial.app.Terminator$StartUp - Do start up action
+17:27:55.993 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.Application - Application is going to shutdown...
+17:27:55.993 [ForkJoinPool-1-worker-2] INFO  uapi.tutorial.app.Terminator$CleanUp - Do clean up action
+17:27:55.998 [ForkJoinPool.commonPool-worker-1] INFO  uapi.tutorial.app.Terminator - The service is deactivated - uapi.tutorial.app.Terminator
+17:27:55.998 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.Application - Application shutdown success.
 
 Process finished with exit code 0
 ```
 
+通过日志可以看到当应用停止时，框架首先会发布`AppShutdownEvent`事件，`Terminator` 通过该事件来做一些清理工作，然后框架会调用每个应用服务被`OnDeactivate`标注的方法。
+
 # 总结
+
 当应用启动时，UAPI框架提供了AppStartupEvent，当应用终止时，UAPI框架提供了AppShutdownEvent。
 通过发出ExitSystemRequest事件来主动请求UAPI框架终止应用。
