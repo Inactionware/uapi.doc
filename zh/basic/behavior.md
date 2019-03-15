@@ -224,8 +224,120 @@ public class LoginUserApp {
 
 可以看到```LoginFailedAction```被调用了。
 
-# 事件和行为的绑定
-
 # 行为复用
 
 行为本身也是有输入和输出，因此行为可以作为活动来进行复用的。
+
+下面例子里面我们先创建一个活动：
+
+```java
+@Service
+@Action
+@Tag("SayGreeting")
+public class GetUserAction {
+
+    @ActionDo
+    public void get(
+            final AppStartupEvent event,
+            final ActionOutput<String> name
+    ) {
+        name.set("Min");
+    }
+}
+```
+
+这个活动模拟获取用户名，并将作为活动的输出。
+
+然后我们创建一个活动用来产生一个问候语句：
+
+```java
+@Service
+@Action
+@Tag("SayGreeting")
+public class MakeGreetingAction {
+
+    @ActionDo
+    public void makeGreeting(
+            final String name,
+            final ActionOutput<String> greeting
+    ) {
+        String msg = StringHelper.makeString("Hi {}, how are you!", name);
+        greeting.set(msg);
+    }
+}
+```
+
+这个活动很简单，把输入的用户名字拼接到问候语中，然后返回该问候语。
+
+最后我们将问候语输出到控制台上：
+
+```java
+@Service
+@Action
+@Tag("SayGreeting")
+public class OutGreetingAction {
+
+    @Inject
+    protected ILogger _logger;
+
+    @ActionDo
+    public void out(final String greeting) {
+        this._logger.info(greeting);
+    }
+}
+```
+
+接下来我们展示如何复用行为：
+
+```java
+@Service(autoActive = true)
+@Tag("SayGreeting")
+public class GreetingApp {
+
+    @Inject
+    protected IResponsibleRegistry _respReg;
+
+    @OnActivate
+    public void activate() {
+        IResponsible greeting = this._respReg.register("Greeting Maker");
+        IBehavior makeGreeting = greeting.newBehavior("Make Greeting", String.class)
+                .then(MakeGreetingAction.class)
+                .build();
+
+        greeting.newBehavior("Out Greeting", AppStartupEvent.class, AppStartupEvent.TOPIC)
+                .then(GetUserAction.class)
+                .then(makeGreeting.getId())
+                .then(OutGreetingAction.class)
+                .build();
+    }
+}
+```
+
+上面的代码，我们首先创建了一个名为```greeting```的```IResponsible```对象，该对象是用来创建行为的。
+然后我们在```greeting```上创建了一个```Make Greeting```的行为，这个行为只有一个活动。
+
+接下来我们创建了一个新的名为```Out Greeting```的行为，这个行为包含了三个动作，其中第二个动作其实就是```Make Greeting```的行为。
+
+执行该程序将获得下面输出：
+
+```shell
+13:32:57.974 [Thread-4] INFO  u.c.internal.FileBasedConfigProvider - Config update system.config -> conf/say-greeting.yaml
+13:32:58.103 [Thread-4] INFO  u.c.internal.FileBasedConfigProvider - Config path is conf/say-greeting.yaml
+13:32:58.303 [ForkJoinPool-1-worker-1] INFO  u.a.i.Application.StartupApplication - Application is going to startup...
+13:32:58.303 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.ProfileManager - Active profile is - SayGreetingProfile
+13:32:58.364 [ForkJoinPool-1-worker-1] INFO  u.a.i.Application.StartupApplication - The application is launched
+13:32:58.365 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.Application - Application startup success.
+13:32:58.366 [ForkJoinPool-1-worker-1] INFO  u.t.behavior.OutGreetingAction - Hi Min, how are you!
+```
+
+# 事件和行为的绑定
+
+传统的服务端程序中，需要执行许多业务逻辑，大部分逻辑会访问外部资源，例如查询数据库，读写文件，请求外部服务数据等等，通常为了程序易于阅读我们会让线程阻塞直到得到所需的数据才会继续执行，这种情况我们会创建多个线程来使得程序能支持多的并发量，但是所带来的问题就是很多线程都处于阻塞状态，使得资源利用率不高，而且管理多个线程对于系统而言消耗也是非常大的，所以在这种IO密集型的程序中，多线程的阻塞模式是不适合的，取而代之的应该使用无阻塞的模型。
+
+行为框架给非阻塞的模式提供了支持。
+
+行为本身可以由事件触发，并且在行为结束时可以抛出事件或者在行为执行过程中通过上下文的对象抛出特定的事件。
+
+# 行为跟踪
+
+框架提供API来对行为执行的状况进行追踪，这在调试的时候非常有用。
