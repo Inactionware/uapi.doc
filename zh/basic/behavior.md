@@ -224,6 +224,27 @@ public class LoginUserApp {
 
 可以看到```LoginFailedAction```被调用了。
 
+# 匿名活动
+
+前面的列子都是通过新的类型来定义行为，然后通过活动的类型或者ID来将活动加入到行为中，但是当一个活动的代码非常简单的情况下，这种方式会非常麻烦，框架提供了通过匿名行为的方式来简化活动的定义。
+
+例如我们可以在上面的```SimpleApp```中加入匿名活动：
+
+```java
+    @OnActivate
+    public void activate() {
+        this._respReg.register("A Responsible")
+                .newBehavior("Simple Behavior", AppStartupEvent.class, AppStartupEvent.TOPIC)
+                .then(SimpleAction.actionId)
+                .call(execCtx -> this._logger.info("End execute SimpleAction by {}.", execCtx.behaviorName()))
+                .build();
+    }
+```
+
+这里使用了```call```方法传入了一个Lambda表达式，该表达式包含了匿名活动需要执行的代码。
+
+虽然匿名活动非常简单，但是和传统的活动而言，它不能有输入和输出，不过您可以通过```IExecutionContext```来获取当前行为的输入以及其他活动的输出数据。
+
 # 行为复用
 
 行为本身也是有输入和输出，因此行为可以作为活动来进行复用的。
@@ -330,6 +351,90 @@ public class GreetingApp {
 13:32:58.366 [ForkJoinPool-1-worker-1] INFO  u.t.behavior.OutGreetingAction - Hi Min, how are you!
 ```
 
+# 行为跟踪
+
+框架提供API来对行为执行的状况进行追踪，这在调试的时候非常有用。
+
+我们创建一个用于追踪的活动：
+
+```java
+@Service
+@Action
+@Tag("TraceBehavior")
+public class TraceAction {
+
+    @Inject
+    protected ILogger _logger;
+
+    @ActionDo
+    public void execute() {
+        this._logger.info("I am TraceAction");
+    }
+}
+```
+
+这个简单的活动就是输出一行日志信息用以表明该活动被调用了。
+
+接下来创建App：
+
+```java
+@Service(autoActive = true)
+@Tag("TraceBehavior")
+public class TraceApp {
+
+    @Inject
+    protected IResponsibleRegistry _respReg;
+
+    @Inject
+    protected ILogger _logger;
+
+    private final BehaviorExecutingEventHandler execHandler = (execEvent) -> {
+        this._logger.info(
+                "Action executed: {}\n\tAction inputs: {}\n\tAction outputs: {}",
+                execEvent.executingActionId().toString(),
+                CollectionHelper.asString(execEvent.currentInputs()),
+                CollectionHelper.asString(execEvent.currentOutputs()));
+        return null;
+    };
+
+    @OnActivate
+    public void activate() {
+        IResponsible resp = this._respReg.register("Tracer");
+        resp.newBehavior("Tracer Behavior", AppStartupEvent.class, AppStartupEvent.TOPIC)
+                .then(TraceAction.class)
+                .traceable(true)
+                .build();
+        resp.on(execHandler);
+    }
+}
+```
+
+首先我们用Lambda表达式声明了一个```BehaviorExecutingEventHandler```的实例，逻辑非常简单，就是输出当前被执行的活动的编号，输入和输出。 
+
+要追踪一个行为是很简单的，只需要在创建行为的时候调用```traceable```方法，并传入true即可，然后在该行为所属的```IResponnsible```对象上传入```IBehaviorExecutingHandler```对象，那么当行为执行完每个活动后都会调用该Handler对象。
+
+执行该代码，可以得到：
+
+```shell
+13:22:50.434 [ForkJoinPool.commonPool-worker-1] INFO  u.c.internal.FileBasedConfigProvider - Config update system.config -> conf/trace-behavior.yaml
+13:22:50.475 [ForkJoinPool.commonPool-worker-1] INFO  u.c.internal.FileBasedConfigProvider - Config path is conf/trace-behavior.yaml
+13:22:50.514 [ForkJoinPool-1-worker-1] INFO  u.a.i.Application.StartupApplication - Application is going to startup...
+13:22:50.514 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.ProfileManager - Active profile is - TraceBehaviorProfile
+13:22:50.521 [ForkJoinPool-1-worker-1] INFO  u.a.i.Application.StartupApplication - The application is launched
+13:22:50.521 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.Application - Application startup success.
+13:22:50.523 [ForkJoinPool-1-worker-2] INFO  uapi.tutorial.behavior.TraceAction - I am TraceAction
+13:22:50.523 [ForkJoinPool-1-worker-1] INFO  uapi.tutorial.behavior.TraceApp - Action executed: uapi.behavior.internal.Behavior.HeadAction@ACTION
+    Action inputs: 
+    Action outputs: uapi.app.AppStartupEvent@2e1f2657
+13:22:50.523 [ForkJoinPool-1-worker-3] INFO  uapi.tutorial.behavior.TraceApp - Action executed: uapi.tutorial.behavior.TraceAction@ACTION
+    Action inputs: 
+    Action outputs: 
+```
+
+正如代码所写，会在控制台输出每个被执行的活动和活动的输入和输出，这里可以看到有个```HeadAction```特殊活动被执行了，这是一个内部对象，它会在每个活动执行时第一个被执行。
+
+因为每个活动执行后都会调用```Handler```，因此如果```Handler```里面有大量逻辑的话会极大影响行为的执行效率，所以这种情况下应该在```Handler```最后返回一个```BehaviorEvent```，然后在另一个行为事件处理器中处理该耗时操作。
+
 # 事件和行为的绑定
 
 传统的服务端程序中，需要执行许多业务逻辑，大部分逻辑会访问外部资源，例如查询数据库，读写文件，请求外部服务数据等等，通常为了程序易于阅读我们会让线程阻塞直到得到所需的数据才会继续执行，这种情况我们会创建多个线程来使得程序能支持多的并发量，但是所带来的问题就是很多线程都处于阻塞状态，使得资源利用率不高，而且管理多个线程对于系统而言消耗也是非常大的，所以在这种IO密集型的程序中，多线程的阻塞模式是不适合的，取而代之的应该使用无阻塞的模型。
@@ -337,7 +442,3 @@ public class GreetingApp {
 行为框架给非阻塞的模式提供了支持。
 
 行为本身可以由事件触发，并且在行为结束时可以抛出事件或者在行为执行过程中通过上下文的对象抛出特定的事件。
-
-# 行为跟踪
-
-框架提供API来对行为执行的状况进行追踪，这在调试的时候非常有用。
