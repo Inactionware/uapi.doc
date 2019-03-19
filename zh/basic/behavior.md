@@ -435,10 +435,109 @@ public class TraceApp {
 
 因为每个活动执行后都会调用```Handler```，因此如果```Handler```里面有大量逻辑的话会极大影响行为的执行效率，所以这种情况下应该在```Handler```最后返回一个```BehaviorEvent```，然后在另一个行为事件处理器中处理该耗时操作。
 
-# 事件和行为的绑定
+# 事件触发行为
 
 传统的服务端程序中，需要执行许多业务逻辑，大部分逻辑会访问外部资源，例如查询数据库，读写文件，请求外部服务数据等等，通常为了程序易于阅读我们会让线程阻塞直到得到所需的数据才会继续执行，这种情况我们会创建多个线程来使得程序能支持多的并发量，但是所带来的问题就是很多线程都处于阻塞状态，使得资源利用率不高，而且管理多个线程对于系统而言消耗也是非常大的，所以在这种IO密集型的程序中，多线程的阻塞模式是不适合的，取而代之的应该使用无阻塞的模型。
 
-行为框架给非阻塞的模式提供了支持。
+简单的说无阻塞模型就是当遇到请求外部耗时资源的时候，例如读写文件，网络请求等，线程并不等待响应的返回，而是注册回调并继续执行后续逻辑或者释放当前线程，当外部资源响应到达的时候再调用先前注册的回调逻辑。
 
-行为本身可以由事件触发，并且在行为结束时可以抛出事件或者在行为执行过程中通过上下文的对象抛出特定的事件。
+行为框架对非阻塞的模式提供了支持，因为行为本身可以由事件触发，并且在行为执行过程中以及结束后可以选择抛出特定的事件，则通过事件我们可以把多个相关业务逻辑分开或者并行执行，比如我们需要向网络发送请求，可以在请求发送之后将上下文保存并结束当前行为，然后当响应到达后发出新的事件，由新的事件处理器恢复上下文继续后续的逻辑处理。
+
+下面的例子展示了如何在行为执行过程中抛出事件：
+
+```java
+@Service
+@Action
+@Tag("EventTrigger")
+public class EventTriggerSourceAction {
+
+    @Inject
+    protected ILogger _logger;
+
+    @ActionDo
+    public void execute(final AppStartupEvent event, final IExecutionContext execCtx) {
+        this._logger.info("Raise an event from {}", execCtx.responsibleName());
+        execCtx.fireEvent(new TriggerEvent(execCtx.responsibleName()));
+
+    }
+}
+```
+
+首先我们创建了一个活动，这个活动在执行过程中利用上下文对象发出了一个自定义的事件。
+
+```java
+@Service
+@Action
+@Tag("EventTrigger")
+public class EventTriggerTargetAction {
+
+    @Inject
+    protected ILogger _logger;
+
+    @ActionDo
+    public void execute(final TriggerEvent event) {
+        this._logger.info("Receive an event from {}", event.sourceName());
+    }
+}
+```
+
+这里创建了一个活动，它的输入时上述活动发出的事件对象，它只是打印日志输出了事件源的信息。
+
+```java
+public class TriggerEvent extends BehaviorEvent {
+
+    public static final String TOPIC    = "MyEventTopic";
+
+    public TriggerEvent(String sourceName) {
+        super(TOPIC, sourceName);
+    }
+}
+```
+
+事件定义非常简单，你可以在你自己的事件里面定义任何数据，这里要注意事件必须继承```BehaviorEvent```对象，否则无法触发响应的行为。
+
+```java
+@Service(autoActive = true)
+@Tag("EventTrigger")
+public class EventTriggerApp {
+
+    @Inject
+    protected IResponsibleRegistry _respReg;
+
+    @Inject
+    protected ILogger _logger;
+
+    @OnActivate
+    public void activate() {
+        IResponsible myResp = this._respReg.register("My Responsible");
+        myResp.newBehavior("My Behavior", AppStartupEvent.class, AppStartupEvent.TOPIC)
+                .then(EventTriggerSourceAction.class)
+                .then(Sleep.class, "Sleep", IntervalTime.parse("1s"))
+                .onSuccess((success, ctx) -> { this._logger.info("{} execution done", ctx.behaviorName()); return null; })
+                .build();
+
+        IResponsible otherResp = this._respReg.register("My Other Responsible");
+        otherResp.newBehavior("Other Behavior", TriggerEvent.class, TriggerEvent.TOPIC)
+                .then(EventTriggerTargetAction.class)
+                .build();
+    }
+}
+```
+
+这段代码创建了两个责任者，第一个名为```myResp```的责任者创建了一个行为，这个行为包含了先前定义的会发送自定义事件的活动，然后会等待1秒（```Sleep```活动），最后在行为执行成功后输出一行日志。第二个责任者名为```otherResp```，它定义了一个行为，该行为就一个活动用来接收自定的事件。
+
+运行该代码得到下面的输出：
+
+```shell
+16:55:20.136 [Thread-4] INFO  u.c.internal.FileBasedConfigProvider - Config update system.config -> conf/event-trigger.yaml
+16:55:20.233 [Thread-4] INFO  u.c.internal.FileBasedConfigProvider - Config path is conf/event-trigger.yaml
+16:55:20.411 [ForkJoinPool-1-worker-1] INFO  u.a.i.Application.StartupApplication - Application is going to startup...
+16:55:20.412 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.ProfileManager - Active profile is - EventTriggerProfile
+16:55:20.436 [ForkJoinPool-1-worker-1] INFO  u.a.i.Application.StartupApplication - The application is launched
+16:55:20.436 [ForkJoinPool-1-worker-1] INFO  uapi.app.internal.Application - Application startup success.
+16:55:20.452 [ForkJoinPool-1-worker-1] INFO  u.t.b.EventTriggerSourceAction - Raise an event from My Responsible
+16:55:20.453 [ForkJoinPool-1-worker-0] INFO  u.t.b.EventTriggerTargetAction - Receive an event from My Responsible
+16:55:21.455 [ForkJoinPool-1-worker-1] INFO  u.tutorial.behavior.EventTriggerApp - My Behavior execution done
+```
+
+通过让第一个行为等待1秒，可以看到两个行为是并行执行的。
