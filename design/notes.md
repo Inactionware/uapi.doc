@@ -7,12 +7,32 @@ Development Notes
 
 * The code generation template file name/path should avoid repetition, because there is only on class loader to load all template file, so if there are more than one template file has same file name or path in the different jar will cause load wrong template file.
 
-## How to release version
+## How to start new feature/issue development?
 
-* Update all project version in the configuration repo.
-* Create new tag of the configuration repo, the tag name should be based on previously tag name.
-* In project repo, update varialbe in setup-env.sh to point new tag of configuration repo.
-* Create new tag or branch in project repo.
+* In ```project repo```, create a new branch for new feature development project, the branch name likes "feature/xxx" or "bugfix/xxx".
+* In ```configuration repo```, create new branch which name should likes "uapi/feature/xxx" or "uapi/bugfix/xxx.
+* In ```configuration repo```, increse developed project version number.
+* In ```project repo```, modify configuration item (cfgBranch=xxx) in your developed projects build script (setup-env.sh) to point new version which is defined in ```configuration repo```.
+* Start development.
+
+## How to create new release?
+
+* In ```configuration repo```, create PR from project feature/issue branch to project main branch.
+* In ```configuration repo```, create new git tag for the ```Configuration repo```, the name likes "uapi/xxx.
+* In ```project repo```, create PR from feature/issue development branch to project main branch.
+* In ```project repo```, create new "release branch", the branch pattern is "v[major verion].[minor verion].x".
+* In ```project repo```, update config item (cfgBranch=xxx) in developed projects build script (setup-env.sh) in release branch to point new git tag in ```configuration repo```.
+
+## How to fix issue on released project?
+
+* Create a new branch based on git "release branch" in project repo, the name likes "bugfix/xxx".
+* Create new branch based on git tagged "Configuration" project, the branch name likes "bugfix/xxx".
+* Increse version number of projects which is your developing in "Configuration" project.
+* Modify configuration in (cfgBranch=xxx) in your projects build script (setup-env.sh) to point to new Configuration project branch.
+* When you finish development, you should create PR to "release branch".
+* Create new git tag for "Configuration" project based on the branch which is created on step 2.
+* Modify configuration in (cfgBranch=xxx) in your projects build script (setup-env.sh) to point to new tag in "Configuration repo".
+* Remove "bugfix/xxx" branch on both "project repo" and "configuration repo". 
 
 ## Copyright text
 
