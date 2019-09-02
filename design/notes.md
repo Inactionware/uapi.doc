@@ -16,12 +16,10 @@ Development Notes
 * Start development.
 
 ## How to create new release?
-
-* In `configuration repo`, create PR from project feature/issue branch to project main branch.
-* In `configuration repo`, create new git tag for the `Configuration repo`, the name likes "uapi/xxx.
-* In `project repo`, create PR from feature/issue development branch to project main branch.
-* In `project repo`, create new "release branch", the branch pattern is "v[major verion].[minor verion].x".
-* In `project repo`, update config item (cfgBranch=xxx) in developed projects build script (setup-env.sh) in release branch to point new git tag in `configuration repo`.
+* In `configuration repo`, create new git branch named likes "uapi/vxx, the `xx` is version number.
+* In `configuration repo`, change project's type to `stable` if necessary.
+* In `project repo`, create new "release branch", the branch pattern is "release/v[major verion]-[minor verion]-[fix version]", minor version and fix version is optional.
+* In `project repo`, update config item (cfgBranch=xxx) in projects build script (setup-env.sh) in release branch to point new git branch in `configuration repo`.
 
 ## How to fix issue on released project?
 
