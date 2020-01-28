@@ -9,6 +9,10 @@ UAPI(Universal Application Platform Infrastructure)框架旨在为开发者提�
 
 在众多领域对象中我们会发现有一些领域对象包含了一些非常通用的逻辑，它们被大多数其他的领域对象所依赖，这些领域对象就变成了程序库，例如Java里面的Collections就是典型的程序库，它提供了集合的功能。
 
+# 需求
+
+UAPI框架需要JDK9或以后版本
+
 # 概念
 UAPI框架提供了服务依赖管理，例如：
 ```Java
