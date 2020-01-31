@@ -146,7 +146,7 @@ public class IdentifiedService { }
 
 通过日志可以看到，当应用启动时，`IdBasedInjectionService`打印出`The IdentifiedService is injected!`的信息。
 
-## 使用服务工厂
+## 基于工厂注入（建议使用原型注入）
 
 在某些情况下我们声明的服务是一个服务工厂，当服务注入发生的时候由该工厂返回真正的服务，这时候我们需要使用服务工厂，例如：
 ```java
@@ -198,6 +198,107 @@ public class AServiceFactory implements IServiceFactory<IAService> {
 ```
 
 通过日志我们可以看到`FactoryBasedInjectionService`在启动中打印出`The AService is injected!`的信息。
+
+## 基于原型注入
+
+原型类似于工厂注入，所区别的是原型注入无需创建一个服务工厂，每当注入发生的时候，框架会创建该原型服务的对象。
+
+基于原型注入的方式要优于基于工厂注入，不仅仅相比基于工厂注入有更少的代码量，而且基于原型注入允许为每个原型实例提供不同的参数。
+
+例子：
+
+```java
+@Service(autoActive = true)
+@Tag("PrototypeBasedInjection")
+public class PrototypeBasedInjectionService {
+
+    @Inject
+    protected ILogger _logger;
+
+    @Inject
+    protected PrototypeService _protoSvc;
+
+    @OnActivate
+    public void activate() {
+        if (this._protoSvc != null) {
+            this._logger.info("The prototype service was injected.");
+        } else {
+            this._logger.error("The prototype service was not injected");
+        }
+    }
+}
+
+@Service(type = ServiceType.Prototype)
+@Tag("PrototypeBasedInjection")
+public class PrototypeService { }
+```
+
+`PrototypeService` 是一个原型服务，`PrototypeBasedInjectionService` 是一个依赖原型服务的服务，启动该服务所属的应用，可以得到以下日志：
+
+```shell
+17:11:35.590 [ForkJoinPool.commonPool-worker-3] INFO  u.c.internal.FileBasedConfigProvider - Config update system.config -> conf/prototype-based-injection.yaml
+17:11:35.623 [ForkJoinPool.commonPool-worker-3] INFO  u.c.internal.FileBasedConfigProvider - Config path is conf/prototype-based-injection.yaml
+17:11:35.656 [ForkJoinPool-1-worker-3] INFO  u.a.i.Application.StartupApplication - Application is going to startup...
+17:11:35.657 [ForkJoinPool-1-worker-3] INFO  uapi.app.internal.ProfileManager - Active profile is - PrototypeBasedInjection
+17:11:35.663 [ForkJoinPool.commonPool-worker-3] INFO  u.t.s.PrototypeBasedInjectionService - The prototype service was injected.
+17:11:35.663 [ForkJoinPool-1-worker-3] INFO  u.a.i.Application.StartupApplication - The application is launched
+17:11:35.663 [ForkJoinPool-1-worker-3] INFO  uapi.app.internal.Application - Application startup success.
+17:11:35.663 [ForkJoinPool-1-worker-3] WARN  uapi.event.internal.EventBus - There are no event handler for event topic - ApplicationStartup
+```
+
+可以看到日志输出`The prototype service was injected`的信息表明了该原型实例已经注入到了`PrototypeBasedInjectionService`中了。
+
+基于原型的注入方式还可以指定`Attribute`来创建原型实例，例如
+
+```java
+@Service(
+        type = ServiceType.Prototype,
+        value = IHttpListener.class)
+public class HttpListener implements IHttpListener {
+
+    @Attribute(HttpAttributes.HOST)
+    protected String _host;
+
+    @Attribute(HttpAttributes.PORT)
+    protected int _port;
+  
+    ...
+}
+```
+
+`HttpListener`是一个负责侦听HTTP请求的原型服务，当初始化的时候它需要侦听的地址和端口，这里我们用`@Attribute`注解在`_host`和`_port`两个字端上，表明初始化该原型实例的时候需要提供地址和端口属性。
+
+当通过服务注册器(IRegistry)来获取原型服务实例的时候要提供原型必须的属性，例如：
+
+```java
+@Service
+@Action
+public class ListenHttpPort {
+
+    public static final ActionIdentify actionId = ActionIdentify.toActionId(ListenHttpPort.class);
+
+    @Config(path="server.host")
+    protected String _host;
+
+    @Config(path="server.port")
+    protected int _port;
+
+    @Inject
+    protected IRegistry _registry;
+
+    @ActionDo
+    public void run(Object input) {
+        Map<String, Object> attrs = new HashMap<>();
+        attrs.put(HttpAttributes.HOST, this._host);
+        attrs.put(HttpAttributes.PORT, this._port);
+        attrs.put(HttpAttributes.EVENT_SOURCE, "APIServer");
+        IHttpListener httpListener = this._registry.findService(IHttpListener.class, attrs);
+        httpListener.startUp();
+    }
+}
+```
+
+在`ListenHttpPort`服务中，我们通过配置获取了要侦听的地址和端口，然后初始化属性Map，将该属性Map作为参数从`IRegistry`中获取新的原型服务实例。
 
 ## 通过方法注入服务
 使用`Inject`注解不仅可以声明在类字段中注入服务，也可以在方法上声明，指明在注入发生的时候使用该方法来注入，通常如果我们做一些额外的逻辑的时候就可以使用方法注入，例如：
