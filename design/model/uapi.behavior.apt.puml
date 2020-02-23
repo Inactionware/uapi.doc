@@ -1,0 +1,26 @@
+@startuml Module for uapi.behavior.apt
+
+!includesub uapi.codegen.puml!API
+
+!startsub API
+namespace uapi.behavior.annotation {
+    interface Action <<Annotation>>
+    interface ActionDo <<Annotation>>
+
+    namespace helper {
+        interface IActionHandlerHelper
+
+        uapi.codegen.IHandlerHelper <|-- IActionHandlerHelper
+    }
+}
+!endsub
+
+!startsub IMPL
+namespace uapi.behavior.internal {
+    class ActionHandler
+
+    uapi.codegen.AnnotationsHandler <|-- ActionHandler
+}
+!endsub
+
+@enduml

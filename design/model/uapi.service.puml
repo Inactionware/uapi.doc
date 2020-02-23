@@ -1,0 +1,10 @@
+@startuml Module for uapi.service
+
+!startsub API
+namespace uapi.service {
+    interface IServiceLifecycle
+    interface IServiceModulePortal
+}
+!endsub
+
+@enduml

@@ -1,0 +1,254 @@
+@startuml behavior api
+
+!includesub uapi.common.puml!API
+
+!includesub uapi.common.puml!API_COMMON
+hide uapi.common.*
+
+!includesub uapi.exception.puml!UAPI_EXCEPTION
+hide uapi.exception.*
+
+!includesub uapi.event.puml!API
+hide uapi.event.*
+
+!includesub uapi.service.puml!API
+hide uapi.service.*
+
+!startsub API
+namespace uapi.behavior {
+
+    class BehaviorEvent {
+        +sourceName(): String
+    }
+
+    class BehaviorTraceEvent {
+        +{static} TOPIC: String = "BehaviorTrace"
+        +topic(): String
+        +executionId(): String
+        +behaviorName(): String
+        +originalData(): Object
+        +data(): Object
+        +responsibleName(): String
+    }
+
+    class BehaviorExecutingEvent {
+        +actionId(): String
+    }
+
+    class BehaviorFinishedEvent
+
+    interface IAction<ActionIdentify> {
+        +inputMetas(): ActionInputMeta[]
+        +outputMetas(): ActionOutputMeta[]
+        +isAnonymous(): boolean
+        +process(inputs: Object[], outputs: ActionOutput[], context: IExecutionContext)
+    }
+
+    interface IBehavior {
+        +traceable(): boolean
+    }
+
+    interface IInterceptor
+
+    class ActionInputMeta {
+        +type(): Class
+    }
+
+    class ActionOutputMeta {
+        +type(): Class
+        +name(): String
+        +isAnonymous(): boolean
+    }
+
+    class ActionOutput<T> {
+        +set(output: T)
+        +get(): T
+        +meta(): ActionOutputMeta
+    }
+
+    interface IExecutionContext
+
+    class ActionIdentify<String> {
+        +{static}parse(id: String): ActionIdentify
+        +{static}parse(actionType: Class): ActionIdentify
+        +getName(): String
+        +getType(): ActionType
+    }
+
+    class ExecutionIdentify {
+        -_sequence: int
+        getSequence(): int
+    }
+
+    enum ActionType {
+        ACTION
+        BEHAVIOR
+    }
+
+    interface IResponsibleRegistry {
+        register(name: String): IResponsible
+        unregister(name: String)
+        responsibleCount(): int
+    }
+
+    interface IResponsible {
+        name(): String
+        newBehavior(name: String, topic: String): IBehaviorBuilder
+        newBehavior(name: String, eventType: Class, topic: String): IBehaviorBuilder
+        newBehavior(name: String, types: Class[]): IBehaviorBuilder
+        on(handler: BehaviorExecutingEventHandler)
+        on(handler: BehaviorFinishedEventHandler)
+    }
+
+    interface IBehaviorBuilder {
+        +traceable(traceable: boolean): IBehaviorBuilder
+        +when(evaluator: Functional.Evaluator): IBehaviorBuilder
+        +then(id: ActionIdentify): IBehaviorBuilder
+        +then(id: ActionIdentify, label: String, inputs: Object[]): IBehaviorBuilder
+        +then(actionType: Class): IBehaviorBuilder
+        +then(actionType: Class, label: String, inputs: Object[]): IBehaviorBuilder
+        +call(call: AnonymousCall): IBehaviorBuilder
+        +call(call: AnonymousCall, label: String): IBehaviorBuilder
+        +onSuccess(action: BehaviorSuccessAction): IBehaviorBuilder
+        +onFailure(action: BehaviorFailureAction): IBehaviorBuilder
+        +navigator(): INavigator
+        +wired(): IWired
+    }
+
+    interface INavigator {
+        +moveToHead(): IBehaviorBuilder
+        +moveTo(label: String): IBehaviorBuilder
+    }
+
+    interface IWired {
+        +toOutput(actionLabel: String, outputName: String): IOutputReference
+        +toOutput(actionLabel: String, outputIndex: int): IOutputReference
+    }
+
+    interface IOutputReference {
+        +actionLabel(): String
+    }
+
+    interface BehaviorFailureAction <<Functional Interface>> {
+        +accept(failure: BehaviorFailure, execContext: IExecutionContext): BehaviorEvent
+    }
+
+    interface BehaviorSuccessAction <<Functional Interface>> {
+        +accept(access: BehaviorSuccess, execContext: IExecutionContext): BehaviorEvent
+    }
+
+    interface AnonymousCall <<Functional Interface>> {
+        +accept(execContext: IExecutionContext)
+    }
+
+    class BehaviorFailure {
+        +failureAction(): ActionIdentify
+        +failureInputs(): Object[]
+        +message(): String
+        +cause(): Exception
+    }
+
+    class BehaviorSuccess {
+        +inputs(): Object[]
+        +outputs(): ActionOutput[]
+    }
+
+    interface BehaviorExecutingEventHandler <<Functional Interface>> {
+        +accept(event: BehaviorExecutingEvent): BehaviorEvent
+    }
+
+    interface BehaviorFinishedEventHandler <<Functional Interface>> {
+        +accept(event: BehaviorFinishedEvent): BehaviorEvent
+    }
+
+    class BehaviorException {
+        {static} +builder(): BehaviorExceptionBuilder
+        #BehaviorException(builder): BehaviorExceptionBuilder
+    }
+
+    class BehaviorExceptionBuilder
+
+    class BehaviorErrors<BehaviorException>
+
+    enum Scope {
+        GLOBAL
+        BEHAVIOR
+    }
+
+    uapi.event.AttributedEvent <|-- BehaviorEvent
+    BehaviorEvent <|-- BehaviorTraceEvent
+    BehaviorTraceEvent <|-- BehaviorExecutingEvent
+    BehaviorTraceEvent <|-- BehaviorFinishedEvent
+    uapi.IIdentifiable <|-- IAction
+    IAction <|-- IBehavior
+    IAction <|-- IInterceptor
+    uapi.IPartibleIdentify <|-- ActionIdentify
+    ActionIdentify <|-- ExecutionIdentify
+    ActionOutput "1" o-- "1" ActionIdentify
+    ActionOutput "1" o-- "1" ActionOutputMeta
+    uapi.exception.ParameterizedException <|-- BehaviorException
+    uapi.exception.ExceptionBuilder <|-- BehaviorExceptionBuilder
+    uapi.exception.FileBasedExceptionErrors <|-- BehaviorErrors
+
+    show uapi.IIdentifiable
+    show uapi.event.AttributedEvent
+    show uapi.exception.FileBasedExceptionErrors
+    show uapi.exception.ExceptionBuilder
+    show uapi.exception.ParameterizedException
+}
+!endsub
+
+!startsub IMPL
+namespace uapi.behavior.internal {
+    class ActionHolder
+    class ActionOutputHolder
+    class AnonymousCall
+    class Behavior<IBehavior>
+    class BehaviorModulePortal
+    class Execution<ExecutionIdentify>
+    class ExecutionContext
+    class InterceptedActionHolder
+    class Responsible
+    class ResponsibleRegistry
+    class BehaviorHolder
+    class Navigator
+    class Wired
+
+    uapi.behavior.IAction <|.. AnonymousCall
+    uapi.common.Builder <|-- Behavior
+    uapi.behavior.IBehavior <|.. Behavior
+    uapi.behavior.IBehaviorBuilder <|.. Behavior
+    uapi.service.IServiceModulePortal <|-- BehaviorModulePortal
+    uapi.IIdentifiable <|.. Execution
+    uapi.behavior.IExecutionContext <|.. ExecutionContext
+    ActionHolder <|-- InterceptedActionHolder
+    uapi.behavior.IResponsible <|.. Responsible
+    uapi.behavior.IResponsibleRegistry <|.. ResponsibleRegistry
+    uapi.service.IServiceLifecycle <|.. ResponsibleRegistry
+    uapi.behavior.INavigator <|.. Navigator
+    uapi.behavior.IWired <|.. Wired
+
+    InterceptedActionHolder *-- uapi.behavior.IInterceptor
+    ResponsibleRegistry o-- uapi.behavior.IAction
+    ResponsibleRegistry *-- Responsible
+    Responsible o-- uapi.behavior.IAction
+    Responsible *-- BehaviorHolder
+    Responsible o-- uapi.behavior.BehaviorExecutingEventHandler
+    Responsible o-- uapi.behavior.BehaviorFinishedEventHandler
+    BehaviorHolder o-- Behavior
+    Behavior "1" *-- "*" ActionHolder
+    Behavior "1" *-- "1" Navigator
+    Behavior "1" *-- "1" Wired
+    Behavior o-- "0..1" uapi.behavior.BehaviorSuccessAction
+    Behavior o-- "0..1" uapi.behavior.BehaviorFailureAction
+    ActionHolder "0" o-- "1" uapi.behavior.IAction
+    ActionHolder "0..1" o-- "*" ActionHolder
+
+    show uapi.IIdentifiable
+    show uapi.common.Builder
+    show uapi.service.IServiceModulePortal
+    show uapi.service.IServiceLifecycle
+}
+!endsub
+
+@enduml

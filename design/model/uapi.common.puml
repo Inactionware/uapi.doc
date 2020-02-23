@@ -1,0 +1,67 @@
+@startuml UAPI API
+
+!includesub java.puml!JAVA_LANG
+hide java.lang.*
+
+!startsub API
+namespace uapi {
+    class UapiException
+    class GeneralException
+    interface IIdentifiable<T>
+    interface IPartibleIdentify<T>
+    interface IModulePortal
+    class InvalidArgumentException
+    class Type
+
+    java.lang.RuntimeException <|-- UapiException
+    UapiException <|-- GeneralException
+    GeneralException <|-- InvalidArgumentException
+    IIdentifiable <|-- IPartibleIdentify
+
+    show java.lang.RuntimeException
+}
+!endsub
+
+!startsub API_COMMON
+namespace uapi.common {
+    class ArgumentChecker
+    interface IAttributed
+    class Attributed
+    abstract class Builder<T>
+    class Capacity
+    enum CapacityUnit
+    class CollectionHelper
+    class ExceptionHelper
+    interface Extractor<I, O, T> <<Functional Interface>>
+    interface Creator<T> <<Functional Interface>>
+    interface Convert<I, O> <<Functional Interface>>
+    interface Action<T> <<Functional Interface>>
+    interface Filter<T> <<Functional Interface>>
+    interface Validator<T> <<Functional Interface>>
+    interface FilterOne<T> <<Functional Interface>>
+    interface Evaluator<T> <<Functional Interface>>
+    interface Apply<T> <<Functional Interface>>
+    class Guarder
+    interface IAwaiting
+    class IntervalTime
+    class MapHelper
+    class Multivariate
+    class Numeric
+    class Pair<L, R>
+    class Repository<K, V>
+    interface Resultful<T>
+    class StringHelper
+    class Watcher
+    class WordHelper
+
+    IAttributed <|.. Attributed
+}
+!endsub
+
+!startsub API_RX
+namespace uapi.rx {
+
+}
+!endsub
+
+@enduml

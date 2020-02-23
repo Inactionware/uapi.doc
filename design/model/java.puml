@@ -1,0 +1,13 @@
+@startuml Module for Java
+
+!startsub JAVA_LANG
+namespace java.lang {
+    class Object
+    class RuntimeException
+    interface Iterable
+
+    Object <|-- RuntimeException
+}
+!endsub
+
+@enduml

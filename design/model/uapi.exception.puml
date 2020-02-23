@@ -1,0 +1,28 @@
+@startuml Module for uapi.exception
+
+!includesub uapi.common.puml!API_COMMON
+hide uapi.common.*
+
+!startsub UAPI_EXCEPTION
+namespace uapi.exception {
+    abstract class ParameterizedException
+    abstract class ExceptionBuilder
+    abstract class FileBasedExceptionErrors<T>
+    abstract class ExceptionErrors<T>
+    interface IParameters<T>
+    abstract class IndexedParameters
+    abstract class NamedParameters<Map>
+    abstract class ParameterizedException
+
+    uapi.common.Builder <|-- ExceptionBuilder
+    uapi.common.UapiExcetpion <|-- ParameterizedException
+    ExceptionErrors <|-- FileBasedExceptionErrors
+    IParameters <|.. IndexedParameters
+    IParameters <|.. NamedParameters
+
+    show uapi.common.Builder
+    show uapi.common.UapiExcetpion
+}
+!endsub
+
+@enduml

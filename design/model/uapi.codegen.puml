@@ -1,0 +1,19 @@
+@startuml Module for uapi.codegen
+
+!startsub API
+namespace uapi.codegen {
+    interface IAnnotationsHandler
+    abstract class AnnotationsHandler
+    interface IHandlerHelper
+
+    IAnnotationsHandler <|.. AnnotationsHandler
+}
+!endsub
+
+!startsub IMPL
+namespace uapi.codegen.internal {
+
+}
+!endsub
+
+@enduml

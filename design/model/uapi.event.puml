@@ -1,0 +1,44 @@
+@startuml Module for uapi.event
+
+!includesub uapi.common.puml!UAPI_COMMON
+hide uapi.common.*
+
+!includesub uapi.service.puml!API
+hide uapi.service.*
+
+!startsub API
+namespace uapi.event {
+    class AttributedEvent
+    class PlainEvent
+    interface IEvent
+    interface IEventHandler<IEvent>
+    interface IAttributedEventHandler<AttributedEvent>
+    interface IEventBus
+    interface IEventFinishCallback<IEvent>
+
+    PlainEvent <|-- AttributedEvent
+    uapi.common.IAttributed <|.. AttributedEvent
+    IEvent <|.. PlainEvent
+    IEventHandler <|-- IAttributedEventHandler
+
+    show uapi.common.IAttributed
+}
+!endsub
+
+!startsub IMPL
+namespace uapi.event.internal {
+    class EventBus
+    class EventModulePortal
+    enum WaitType
+
+    uapi.service.IServiceLifecycle <|.. EventBus
+    uapi.service.IServiceModulePortal <|.. EventModulePortal
+    uapi.event.IEventBus <|.. EventBus
+
+    show uapi.event.IEventBus
+    show uapi.service.IServiceLifecycle
+    show uapi.service.IServiceModulePortal
+}
+!endsub
+
+@enduml
