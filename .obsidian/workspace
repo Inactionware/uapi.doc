@@ -1,0 +1,98 @@
+{
+  "main": {
+    "id": "c5dd504936aa7431",
+    "type": "split",
+    "children": [
+      {
+        "id": "e993a642f3807ee4",
+        "type": "leaf",
+        "dimension": 48.36339345357381,
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "design/requests/Support GraphQL in Http server.md",
+            "mode": "source"
+          }
+        },
+        "group": "9821b747723b8a75"
+      },
+      {
+        "id": "4b9ba46feba7a173",
+        "type": "leaf",
+        "dimension": 51.63660654642619,
+        "active": true,
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "design/requests/Support GraphQL in Http server.md",
+            "mode": "preview"
+          }
+        },
+        "group": "9821b747723b8a75"
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "27fe8f31750ce129",
+    "type": "split",
+    "children": [
+      {
+        "id": "98413fbea841fe0a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9cb3b0045e110648",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "68beeaf39ed6271b",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 407
+  },
+  "right": {
+    "id": "3205cab7ccca6aed",
+    "type": "split",
+    "children": [
+      {
+        "id": "2d78ab82710622a6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b0546a96f8387565",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "design/requests/Support GraphQL in Http server.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "lastOpenFiles": [
+    "design/requests/Support GraphQL in Http server.md",
+    "design/requests/Untitled.md",
+    "design/ideas/Untitled.md",
+    "design/ideas/Performance Analysis.md",
+    "design/Untitled.md"
+  ]
+}
