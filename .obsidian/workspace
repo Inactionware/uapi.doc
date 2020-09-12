@@ -8,8 +8,11 @@
         "type": "leaf",
         "active": true,
         "state": {
-          "type": "empty",
-          "state": {}
+          "type": "markdown",
+          "state": {
+            "file": "design/r2/R2.5 Share data in multiple behaviors.md",
+            "mode": "source"
+          }
         }
       }
     ],
@@ -66,7 +69,9 @@
             "type": "leaf",
             "state": {
               "type": "backlink",
-              "state": {}
+              "state": {
+                "file": "design/r2/R2.5 Share data in multiple behaviors.md"
+              }
             }
           },
           {
@@ -82,7 +87,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "design/r2/R2.5 Share data in multiple behaviors.md"
+              }
             }
           }
         ]
@@ -93,9 +100,9 @@
     "collapsed": true
   },
   "lastOpenFiles": [
+    "design/r2/R2.5 Share data in multiple behaviors.md",
     "2020-09-12.md",
     "en/README.md",
-    "design/r2/R2.5 Share data in multiple behaviors.md",
     "design/r2/R2.4 Behavior and action supports set attribute from behavior builder.md",
     "design/r2/R2.7 Create resource based query languages.md"
   ]
