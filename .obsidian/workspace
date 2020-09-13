@@ -10,7 +10,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "design/r2/R2.5 Share data in multiple behaviors.md",
+            "file": "design/r2/F2.5 Share data in multiple behaviors.md",
             "mode": "source"
           }
         }
@@ -70,7 +70,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "design/r2/R2.5 Share data in multiple behaviors.md"
+                "file": "design/r2/F2.5 Share data in multiple behaviors.md"
               }
             }
           },
@@ -88,7 +88,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "design/r2/R2.5 Share data in multiple behaviors.md"
+                "file": "design/r2/F2.5 Share data in multiple behaviors.md"
               }
             }
           }
@@ -100,10 +100,10 @@
     "collapsed": true
   },
   "lastOpenFiles": [
-    "design/r2/R2.5 Share data in multiple behaviors.md",
-    "2020-09-12.md",
-    "en/README.md",
-    "design/r2/R2.4 Behavior and action supports set attribute from behavior builder.md",
-    "design/r2/R2.7 Create resource based query languages.md"
+    "design/r2/F2.5 Share data in multiple behaviors.md",
+    "design/r2/F2.6 Integrate resource, network and authentication framework.md",
+    "design/r2/R2.7 Create resource based query languages.md",
+    "design/r2/R2.6 Integrate resource, network and authentication framework.md",
+    "design/r2/R2.5 Share data in multiple behaviors.md"
   ]
 }
