@@ -10,10 +10,23 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "design/r2/F2.5 Share data in multiple behaviors.md",
+            "file": "design/r2/R2 Features.md",
             "mode": "source"
           }
-        }
+        },
+        "group": "1165411f991b307b"
+      },
+      {
+        "id": "a628c7fcbc0cb52d",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "design/r2/R2 Features.md",
+            "mode": "preview"
+          }
+        },
+        "group": "1165411f991b307b"
       }
     ],
     "direction": "vertical"
@@ -70,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "design/r2/F2.5 Share data in multiple behaviors.md"
+                "file": "design/r2/R2 Features.md"
               }
             }
           },
@@ -88,7 +101,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "design/r2/F2.5 Share data in multiple behaviors.md"
+                "file": "design/r2/R2 Features.md"
               }
             }
           }
@@ -100,10 +113,10 @@
     "collapsed": true
   },
   "lastOpenFiles": [
+    "design/r2/R2 Features.md",
     "design/r2/F2.5 Share data in multiple behaviors.md",
-    "design/r2/F2.6 Integrate resource, network and authentication framework.md",
-    "design/r2/R2.7 Create resource based query languages.md",
-    "design/r2/R2.6 Integrate resource, network and authentication framework.md",
-    "design/r2/R2.5 Share data in multiple behaviors.md"
+    "design/ideas/State machine can support state extension.md",
+    "design/requests/Event dispatching is not efficient need to enhancement.md",
+    "design/Command Framework.md"
   ]
 }
