@@ -10,7 +10,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "design/r2/R2 Features.md",
+            "file": "design/r2/dd/UAPI Interaction Language.md",
             "mode": "source"
           }
         }
@@ -54,7 +54,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 353
+    "width": 342
   },
   "right": {
     "id": "3205cab7ccca6aed",
@@ -70,7 +70,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "design/r2/R2 Features.md"
+                "file": "design/r2/dd/UAPI Interaction Language.md"
               }
             }
           },
@@ -88,22 +88,21 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "design/r2/R2 Features.md"
+                "file": "design/r2/dd/UAPI Interaction Language.md"
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 335
   },
   "lastOpenFiles": [
-    "design/r2/R2 Features.md",
-    "design/requests/Support GraphQL in Http server.md",
-    "design/requests/Some service just use once, so it can be discarded later to reduce memory usage.md",
-    "design/requests/Provide DB access framework.md",
-    "design/requests/Event dispatching is not efficient need to enhancement.md"
+    "design/r2/dd/UAPI Interaction Language.md",
+    "design/r2/dd/Domain Definition.md",
+    "design/hd/High Level Design.md",
+    "design/Command Framework.md",
+    "design/High Level Design.md"
   ]
 }
