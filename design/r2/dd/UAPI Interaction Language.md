@@ -80,6 +80,13 @@ Topic.update({id:34, title='New Title'}, {id:35, title='New Title'}): {
 }
 ```
 
+## Update batch Domain Object
+```
+Topic.update({author.name:'Mike', author.name='Joe'}): Topic {
+	...
+}
+```
+
 # Domain Deleting
 Delete topic by spefic id
 ```uil

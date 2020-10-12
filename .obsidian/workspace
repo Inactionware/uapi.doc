@@ -10,10 +10,23 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "design/r2/dd/UAPI Interaction Language.md",
+            "file": "design/r2/dd/Protocol Parser Framework.md",
             "mode": "source"
           }
-        }
+        },
+        "group": "9e4229bf0e03aa3a"
+      },
+      {
+        "id": "fbba526f4ba989e8",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "design/r2/dd/Protocol Parser Framework.md",
+            "mode": "preview"
+          }
+        },
+        "group": "9e4229bf0e03aa3a"
       }
     ],
     "direction": "vertical"
@@ -39,7 +52,9 @@
             "type": "leaf",
             "state": {
               "type": "search",
-              "state": {}
+              "state": {
+                "query": ""
+              }
             }
           },
           {
@@ -70,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "design/r2/dd/UAPI Interaction Language.md"
+                "file": "design/r2/dd/Protocol Parser Framework.md"
               }
             }
           },
@@ -88,7 +103,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "design/r2/dd/UAPI Interaction Language.md"
+                "file": "design/r2/dd/Protocol Parser Framework.md"
               }
             }
           }
@@ -96,13 +111,14 @@
       }
     ],
     "direction": "horizontal",
-    "width": 335
+    "width": 335,
+    "collapsed": true
   },
   "lastOpenFiles": [
-    "design/r2/dd/UAPI Interaction Language.md",
+    "design/r2/dd/Protocol Parser Framework.md",
+    "design/r2/dd/UAPI Interaction Language Parser.md",
     "design/r2/dd/Domain Definition.md",
-    "design/hd/High Level Design.md",
-    "design/Command Framework.md",
-    "design/High Level Design.md"
+    "design/r2/dd/UAPI Interaction Language.md",
+    "design/r2/dd/Untitled.md"
   ]
 }
