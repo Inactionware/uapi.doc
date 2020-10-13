@@ -1,16 +1,52 @@
 Application Workflow
 ======
 
+# Define Domain
+
 First, the application should define Domain that application supported, see [[Domain Definition]] for the details.
 
-The client send UIL (UAPI Interaction Language) based request to server, the UQL schema should like below:
+# UIL
+
+The client send UIL (UAPI Interaction Language) based request to server, the UIL schema should like below:
 ```
-<Domain>.<Operation>(<Arguments>): <Domain> {
-    <Domain Field>,
-	...
+<Domain Operation>(<Operation Arguments>): <Operation Return>
+```
+The UIL schema is simple, we discuss each part one by one:
+
+## Domain Operation:
+
+This part specify which Domain operation is invoked, it should be like:
+```
+<Domain Name>.<Operation Name>
+```
+The operation should be defined in the Domain.
+
+## Operation Arguments:
+
+The arguments of the operation should be contains two sections, one section is filter expression list, the second is assignment expression list, each filter or assignment expression is separated by `,`.
+
+The filter use `:` as separator, like:
+```
+<Domain Property>:<value>
+```
+
+The assigement use `=` as separator, like:
+```
+<Domain Property>=<value>
+```
+
+## Operation Return:
+
+The Operation Return specify which Domain will be returned by this operation, it likes:
+```
+<Domain Name> {
+    <Domain Property List>
 }
 ```
-The first `<Domain>` is a business object, the `<Operation>()` is a Domain operation, the Domain Operation can support put `<Arguments>` to filter the result, the `<Domain>` after `:` is the return type of the Domain Operation, if the return type is a `<Domain>[]` which means the Operation return a Domain list. The statements between `{}` is used to specify the Domain fileds. See [[UAPI Interaction Language]] for the details.
+
+See [[UAPI Interaction Language]] for the details.
+
+# 
 
 Application server receive above request, the `ICommunicationEvent` will be thrown, then the event should be handled by `Communicator`, the `Communicator` will do below things:
 * Decode out UQL from `ICommunicationEvent`. -> Using Protocol module
