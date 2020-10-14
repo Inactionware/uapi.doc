@@ -1,0 +1,2 @@
+Each `Responsible` has own task list, the task list contains behavior exectution request, but `Responsible` has no self thread to execute it.
+The system has a thread pool, a deamon thread scans all `Responsible`'s task list and execute the task by `Responsible` priority, the thread dispatch algorithm all task list should be scanned, 优先级决定了哪个`Responsible`的任务被扫描的频率。
