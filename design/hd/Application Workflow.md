@@ -5,56 +5,28 @@ Application Workflow
 
 First, the application should define Domain that application supported, see [[Domain Definition]] for the details.
 
-# UIL
+# DIL (Domain Interaction Language)
 
-The client send UIL (UAPI Interaction Language) based request to server, the UIL schema should like below:
+The UAPI based client using DIL to communicate with UAPI server, the DIL is Domain based language, it used to query/moidfy/delete operations on the Domain, the DIL schema is simple, see below:
 ```
 <Domain Operation>(<Operation Arguments>): <Operation Return>
 ```
-The UIL schema is simple, we discuss each part one by one:
-
-## Domain Operation:
-
-This part specify which Domain operation is invoked, it should be like:
-```
-<Domain Name>.<Operation Name>
-```
-The operation should be defined in the Domain.
-
-## Operation Arguments:
-
-The arguments of the operation should be contains two sections, one section is filter expression list, the second is assignment expression list, each filter or assignment expression is separated by `,`.
-
-The filter use `:` as separator, like:
-```
-<Domain Property>:<value>
-```
-
-The assigement use `=` as separator, like:
-```
-<Domain Property>=<value>
-```
-
-## Operation Return:
-
-The Operation Return specify which Domain will be returned by this operation, it likes:
-```
-<Domain Name> {
-    <Domain Property List>
-}
-```
-
+It just like invoke specific operation on a Domain, the operation returns should like the `Operation Return` notion.
 See [[UAPI Interaction Language]] for the details.
 
-# 
+# Communication Layer
 
 Application server receive above request, the `ICommunicationEvent` will be thrown, then the event should be handled by `Communicator`, the `Communicator` will do below things:
-* Decode out UQL from `ICommunicationEvent`. -> Using Protocol module
-* Get out the root elemet of the UQL and find out the which Domain Operation is invoked.
-* Create new `DomainEvent` with topic named `<Domain>.<Operation>` and throw the event.
+* Decode out DIL from `ICommunicationEvent`. -> Using Protocol module
+* Get out the root elemet of the DIL and find out the which Domain Operation is invoked, verify the operation is valid for the Domain, and the invocation has valid operation arguments.
+* Create new `DomainEvent` with topic named `<Domain>.<Operation>` and throw the event to the Busniess Logic Layer.
+* Receive `DomainResult` event, encode it to DIL and back to client side.
+
+# Busniess Logic Layer
 
 The `DomainEvent` will invoke corresponding Domain Operation which normally generated at compling time based on Domain object.
-The real Domain Operation is a Behavior
+The real Domain Operation is a Behavior.
+After Domain operation done the logic execution, the result will be wrapped to `DomainResult` object then throw out.
 
 ```mermaid
 classDiagram

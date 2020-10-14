@@ -1,4 +1,46 @@
-2The UIL (UAPI Interaction Language) supports query, update, delete on specific Domain or on multiple Domain object.
+# Schema
+
+The UAPI based client using DIL to communicate with UAPI server, the DIL schema is simple, see below:
+```
+<Domain Operation>(<Operation Arguments>): <Operation Return>
+```
+It just like invoke specific operation on a Domain
+
+## Domain Operation:
+
+This part specify which Domain operation is invoked, it should be like:
+```
+<Domain Name>.<Operation Name>
+```
+The operation should be defined in the Domain.
+
+## Operation Arguments:
+
+The arguments of the operation should be contains two sections, one section is filter expression list, the second is assignment expression list, each filter or assignment expression is separated by `,`.
+
+The filter use `:` as separator, like:
+```
+<Domain Property>:<value>
+```
+
+The assigement use `=` as separator, like:
+```
+<Domain Property>=<value>
+```
+
+## Operation Return:
+
+The Operation Return specify which Domain will be returned by this operation, it likes:
+```
+<Domain Name> {
+    <Domain Property List>
+}
+```
+
+
+###############
+
+The UIL (UAPI Interaction Language) supports query, update, delete on specific Domain or on multiple Domain object.
 
 In this article, we will use below Domain in all example:
 ```
