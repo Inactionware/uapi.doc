@@ -19,7 +19,8 @@
     "outline": true,
     "slides": true,
     "audio-recorder": true,
-    "open-with-default-app": true
+    "open-with-default-app": true,
+    "custom-css": true
   },
   "alwaysUpdateLinks": true
 }
