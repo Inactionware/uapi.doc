@@ -9,7 +9,7 @@ The main target for Thread Pool is provide threads to execte `Behavior` which is
 1. A manager thread is always running and is able to manager all thread in the pool.
 2. A manager thread is able to get notification if new task is added.
 
-## Scheduling Algorithm - 2.7.2
+## Scheduling Algorithm - F2.7.2
 1. An interface for Schduling Algorithm.
 2. Default scheduling is priority based.
 # Class Diagram
