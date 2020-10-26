@@ -1,6 +1,11 @@
 Application Workflow
 ======
 
+# Information
+| Name | Value |
+| ------ | ------ |
+| Case No |  2 |
+
 # Define Domain
 
 First, the application should define Domain that application supported, see [[Domain Definition]] for the details.
