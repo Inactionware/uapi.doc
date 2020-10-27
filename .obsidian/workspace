@@ -69,7 +69,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 290
+    "width": 342
   },
   "right": {
     "id": "3205cab7ccca6aed",
@@ -116,6 +116,7 @@
   },
   "lastOpenFiles": [
     "design/hd/Execution of Behavior.md",
+    "design/r2/dd/Unified Thread Management.md",
     "design/r2/dd/Thread Pool.md",
     "design/hd/Application Workflow.md",
     "design/hd/Unified Thread Management.md",
@@ -123,7 +124,6 @@
     "design/hd/Behavior Framework.md",
     "design/r2/dd/ClThread Pool.md",
     "design/r2/dd/Protocol Parser Framework.md",
-    "design/r2/dd/Domain Definition.md",
-    "design/r2/dd/UAPI Interaction Language.md"
+    "design/r2/dd/Domain Definition.md"
   ]
 }
