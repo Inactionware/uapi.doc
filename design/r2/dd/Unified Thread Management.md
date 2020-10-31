@@ -82,7 +82,7 @@ IResponsible->>+ITaskMonitor: newTaskAdd(task)
 ITaskMonitor->>+ThreadManager: newTaskAdd(task)
 ThreadManager->>+IScheduling: newTaskAdd(task)
 IScheduling-->>-ThreadManager: void
-ThreadManager-->-ITaskMonitor: void
+ThreadManager-->>-ITaskMonitor: void
 ITaskMonitor-->>-IResponsible: void
 IResponsible-->>-Client: void
 ```
