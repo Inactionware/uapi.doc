@@ -10,7 +10,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "design/hd/Execution of Behavior.md",
+            "file": "design/r2/dd/Unified Thread Management.md",
             "mode": "source"
           }
         },
@@ -22,7 +22,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "design/hd/Execution of Behavior.md",
+            "file": "design/r2/dd/Unified Thread Management.md",
             "mode": "preview"
           }
         },
@@ -69,8 +69,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 342,
-    "collapsed": true
+    "width": 342
   },
   "right": {
     "id": "3205cab7ccca6aed",
@@ -86,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "design/hd/Execution of Behavior.md"
+                "file": "design/r2/dd/Unified Thread Management.md"
               }
             }
           },
@@ -104,7 +103,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "design/hd/Execution of Behavior.md"
+                "file": "design/r2/dd/Unified Thread Management.md"
               }
             }
           }
@@ -116,15 +115,15 @@
     "collapsed": true
   },
   "lastOpenFiles": [
-    "design/hd/Execution of Behavior.md",
     "design/r2/dd/Unified Thread Management.md",
+    "design/hd/Execution of Behavior.md",
+    "design/r2/dd/Behavior Framework.md",
     "design/hd/Application Workflow.md",
     "design/hd/lExecution of Behavior.md",
     "design/r2/dd/UAPI Interaction Language Parser.md",
     "design/r2/dd/UAPI Interaction Language.md",
     "design/r2/dd/Protocol Parser Framework.md",
     "design/r2/dd/Domain Definition.md",
-    "design/r2/dd/Behavior Framework.md",
     "design/r2/dd/Thread Pool.md"
   ]
 }

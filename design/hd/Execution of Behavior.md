@@ -103,6 +103,7 @@ class ITaskBundle {
 
 class ITaskRepository {
 	<<interface>>
+	+int DEFAULT_PRIORITY = 10
 	+registerTaskBundle(String name) ITaskBundle
 	+registerTaskBundle(String name, int priority) ITaskBundle
 }

@@ -2,7 +2,7 @@ Thread Pool
 ======
 
 # Introduction
-The main target for Thread Pool is provide threads to execte `Behavior` which is defined in `Responsible`, there is a manager thread has resposiblity to scan all `Responsible` and fetch all tasks and dispatch thread to execute `Behavior` which is task associated with it by `Responsible` priority.
+The main target for Thread Pool is provide threads to execte `Task` by priority, there is a manager thread has resposiblity to scan all `Task` in the `Task` repository.
 
 # Feature List
 ## Manager Thread - F2.7.1
@@ -13,93 +13,139 @@ The main target for Thread Pool is provide threads to execte `Behavior` which is
 1. An interface for Schduling Algorithm.
 2. Default scheduling is priority based.
 # Class Diagram
+## Exposed APIs
 ```mermaid
 classDiagram
-
-class IThreadManager {
-	<<interface>>	
-	+register(IResponsible responsible)
-}
-Runnable <|.. IThreadManager
-IThreadManager <|.. ThreadManager
-
-class ThreadManager {
-	<<@Service>>
-	-IResponsible[] responsibles
-}
-ThreadManager "1" *-- "1" TaskMonitor : monitor
-ThreadManager "1" *-- "1" IScheduling
-
-class IScheduling {
-	<<interface>>
-	+nextTask() ITask
-}
-IScheduling <|.. DefaultScheduling
-
-class DefaultScheduling {
-	<<@Service>>
-}
-
-class ITaskMonitor {
-	<<interface>>
-	+newTaskAdded(IPrioritizedTask task)
-}
-
-class TaskMonitor {
-	
-}
-ITaskMonitor <|.. TaskMonitor
-
-class TaskHandler {
-	+setTask(IPrioritizedTask task): void
-}
-Runnable <|.. TaskHandler
-
-class IPrioritized {
-	<<interface>>
-	+priority() int
-}
 
 class ITask {
 	<<interface>>
 	+execute()
 }
 
-class IPrioritizedTask {
+class ITaskSender {
+	<<interface>>
+	+sendTask(ITask task)
+}
+
+class ITaskRepository {
+	<<interface>>
+	+int DEFAULT_PRIORITY = 10
+	+initTaskSender(String name) ITaskSender
+	+initTaskSender(String name, int priority) ITaskSender
+}
+```
+
+## Implementation
+
+```mermaid
+classDiagram
+
+class ITask {
 	<<interface>>
 }
-ITask <|-- IPrioritizedTask
-IPrioritized <|-- IPrioritizedTask
+
+class ITaskSender {
+	<<interface>>
+}
+
+class TaskSender {
+	
+}
+ITaskSender <|.. TaskSender
+
+class ITaskRepository {
+	<<interface>>
+}
+
+class TaskRepository {
+	<<@Service>>
+	-Map~String, TaskSender~ taskSenders
+	-PrioritiedTaskCache taskCache
+	-newTask(int prority, ITask task)
+	~getNewTaskPriorities() List~int~
+	~getTask(int priority) ITask
+}
+ITaskRepository <|.. TaskRepository
+TaskRepository "1" *-- "*" ITaskSender
+TaskRepository "1" *-- "1" PrioritiedTaskCache
+TaskRepository "1" *-- "1" NewTaskNotifier
+TaskRepository "1" *-- "*" ITask
+
+class PrioritiedTaskCache {
+	-Map~int, ITask~ taskBundles
+	+putTask(int priority, ITask task)
+}
+
+class ThreadManager {
+	<<@Service>>
+}
+Runnable <|.. ThreadManager
+ThreadManager "1" *-- "1" TaskRepository
+ThreadManager "1" *-- "1" IScheduling
+ThreadManager "1" *-- "*" TaskHandler
+
+class IScheduling {
+	<<interface>>
+	+nextTask() ITask
+}
+IScheduling <|.. PriorityScheduling
+
+class PriorityScheduling {
+	<<@Service>>
+}
+PriorityScheduling "1" *-- "1" TaskRepository
+
+class NewTaskNotifier {
+	+notify()
+}
+PriorityScheduling "1" *-- "1" NewTaskNotifier
+
+class TaskHandler {
+	+setTask(ITask task): void
+}
+Runnable <|.. TaskHandler
 ```
 # Key Workflows
+## Register
+```mermaid
+sequenceDiagram
+autonumber
+
+Client->>+TaskRepository: initTaskSender
+TaskRepository->>+TaskSender: new
+TaskSender-->>-TaskRepository: sender
+TaskRepository-->>-Client: sender
+```
+
 ## Add New Incoming Task
 ```mermaid
 sequenceDiagram
 autonumber
 
-Client->>+IResponsible: sendMessage(msg)
-IResponsible->>+ITaskMonitor: newTaskAdd(task)
-ITaskMonitor->>+ThreadManager: newTaskAdd(task)
-ThreadManager->>+IScheduling: newTaskAdd(task)
-IScheduling-->>-ThreadManager: void
-ThreadManager-->>-ITaskMonitor: void
-ITaskMonitor-->>-IResponsible: void
-IResponsible-->>-Client: void
+Client->>+TaskSender: sendTask(task)
+TaskSender->>+TaskRepository: newTask(priority, task)
+TaskRepository->>+PrioritiedTaskCache: putTask(priority, task)
+PrioritiedTaskCache-->>-TaskRepository: void
+TaskRepository->>+NewTaskNotifier: notify()
+NewTaskNotifier-->>-TaskRepository: void
+TaskRepository-->>-TaskSender: void
+TaskSender-->>-Client: void
 ```
-## Execute Task
+## Execute Task by Priority
 ```mermaid
 sequenceDiagram
 autonumber
 
-ThreadManager->>+IScheduling: nextTask()
-IScheduling-->>-ThreadManager: task
+ThreadManager->>+PriorityScheduling: nextTask()
+PriorityScheduling->>+TaskRepository: getNewTaskPriorities()
+TaskRepository-->>-PriorityScheduling: List<int>
+PriorityScheduling->>+TaskRepository: getTask(priority)
+TaskRepository-->>-PriorityScheduling: task
+PriorityScheduling-->>ThreadManager: task
 ThreadManager->>+TaskHandler: setTask(task)
+TaskHandler->>+Thread: notify()
+Thread-->>-TaskHandler: void
 TaskHandler-->>-ThreadManager: void
-ThreadManager->>+TaskHandler: notify()
-TaskHandler-->>-ThreadManager: void
-TaskHandler->>+ITask: execute()
-ITask-->>-TaskHandler: done()
-TaskHandler->>+ThreadManager: update()
-ThreadManager-->>TaskHandler: void
 ```
-## Default Schduling Algorithm
+## Priority based Schduling Algorithm
+Todo:
