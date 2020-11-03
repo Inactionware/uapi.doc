@@ -65,3 +65,7 @@ build
 # GitBook files
 #=================================
 _book
+
+# Obsidian files
+#=================================
+.obsidian/

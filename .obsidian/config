@@ -1,5 +1,5 @@
 {
-  "theme": "moonstone",
+  "theme": "obsidian",
   "pluginEnabledStatus": {
     "file-explorer": true,
     "global-search": true,
@@ -22,5 +22,6 @@
     "open-with-default-app": true,
     "custom-css": true
   },
-  "alwaysUpdateLinks": true
+  "alwaysUpdateLinks": true,
+  "enabledPlugins": []
 }
