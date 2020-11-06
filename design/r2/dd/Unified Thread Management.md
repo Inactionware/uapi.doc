@@ -141,11 +141,27 @@ PriorityScheduling->>+TaskRepository: getNewTaskPriorities()
 TaskRepository-->>-PriorityScheduling: List<int>
 PriorityScheduling->>+TaskRepository: getTask(priority)
 TaskRepository-->>-PriorityScheduling: task
-PriorityScheduling-->>ThreadManager: task
+PriorityScheduling-->>-ThreadManager: task
 ThreadManager->>+TaskHandler: setTask(task)
 TaskHandler->>+Thread: notify()
 Thread-->>-TaskHandler: void
 TaskHandler-->>-ThreadManager: void
 ```
-## Priority based Schduling Algorithm
-Todo:
+## Priority based Scheduling Algorithm
+### Pure priority based scheduling
+* Same priority task will put in same FIFO queue.
+* Scheduling get task first from higher prority queue until the queue goes to empty then get task from lower prority queue.
+
+### Scan time based scheduling
+* Same priority task will be put in same FIFO queue.
+* All task queue has a value to record its real priority.
+* Scheduling will scan All task queue to find out the queue which has most highest real priority and then take task from it.
+* The real priorty is dynamic, its calculation is:
+	* The real priority value will be decrease (-1) when the scheduling take a task from the queue.
+	* The real priority value will be increase (priority * coeficient) when the scheduling does not take any task from the queue.
+
+_BAD_: Scan all task queue and increase/decrease the real priority will consume a lot of time.
+
+### Execution time based scheduling
+* Same priority task will be put in same FIFO queue.
+* Each task queue has a value to trace the execution time for the task queue.
