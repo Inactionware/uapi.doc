@@ -1,4 +1,4 @@
-Execution of Behavior
+Thread Pool Based Behavior Execution
 ======
 
 # Terminology
@@ -23,7 +23,7 @@ The `UTM` manages a bundle thread - a thread pool, there is a system level threa
 
 There are two ways to send mesage to `Inbox`:
 * Execute directly (sync way)
-* Send message (async way)
+* Send message (async way) ^193f80
 
 ## Execute Directly
 When a `Behavior` needs invoke other `Behavior` to get its result, the invocation is sync, since the `Behavior` is an `Action`, so `Responsible` can specify a `Behavior` when constructing `Behavior`.
@@ -81,10 +81,10 @@ Thread-->>-Main Thread: void
 | Depends | None |
 
 1. A main thread is always running and is able to manager all thread in the pool.
-2. There is a `TaskBundle` cache which hold all `TaskBundle` which has new incoming task.
-3. The `TaskBundle` using a non-blocking cycle ring to hold all task.
-4. The main thread scans `TaskBundle` cache to get new task.
-5. The thread scheduling algorithm should be abstructed to a common interface that can be easy to extend.
+2. A task repository to manage all tasks.
+3. There is a task channel is used to send new task to task repository.
+5. The main thread scans task repository cache to get new task.
+6. The thread scheduling algorithm should be abstructed to a common interface that can be easy to extend.
 
 ### Exposed APIs
 
@@ -96,16 +96,16 @@ class ITask {
 	+execute()
 }
 
-class ITaskBundle {
+class ITaskChannel {
 	<<interface>>
-	+addTask(ITask task)
+	+putTask(ITask task)
 }
 
 class ITaskRepository {
 	<<interface>>
 	+int DEFAULT_PRIORITY = 10
-	+registerTaskBundle(String name) ITaskBundle
-	+registerTaskBundle(String name, int priority) ITaskBundle
+	+registerTaskChannel(String name) ITaskChannel
+	+registerTaskChannel(String name, int priority) ITaskChannel
 }
 ```
 
@@ -116,7 +116,7 @@ class ITaskRepository {
 | Name | Value |
 | ------ | ------ |
 | Feature Id | 7.2 |
-| Depends | [[Execution of Behavior#Basic Thread Management]] |
+| Depends | [[Thread Pool  Based Behavior Execution#Basic Thread Management]] |
 
 1. Verify `Responsible` and `Behavior` name, the reserved keywork - `:` is not allowed.
 2. Publish `Behavior` to Action Repository by name `Responsible Name::Behavior Name`.
@@ -126,7 +126,7 @@ class ITaskRepository {
 | Name | Value |
 | ------ | ------ |
 | Feature Id | 7.3 |
-| Depends | [[Execution of Behavior#Basic Thread Management]] |
+| Depends | [[Thread Pool  Based Behavior Execution#Basic Thread Management]] |
 
 1. When new `Responsible` is registered, it will invoke `ITaskRepository::registerTaskBundle` to create a `TaskBundle` instance with its priority and hold it.
 2. When `Responsible` receive a new message, it will wrap the messsage to a task and add the task to `TaskBundle`.

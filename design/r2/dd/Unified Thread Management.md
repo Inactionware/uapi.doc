@@ -1,15 +1,19 @@
-Thread Pool
+Unified Thread Management
 ======
 
 # Introduction
 The main target for Thread Pool is provide threads to execte `Task` by priority, there is a manager thread has resposiblity to scan all `Task` in the `Task` repository.
 
+| Feature | Status |
+| ------ | ------ |
+| [[Thread Pool  Based Behavior Execution#Basic Thread Management]] | Processing |
+
 # Feature List
-## Manager Thread - F2.7.1
+## Manager Thread
 1. A manager thread is always running and is able to manager all thread in the pool.
 2. A manager thread is able to get notification if new task is added.
 
-## Scheduling Algorithm - F2.7.2
+## Scheduling Algorithm
 1. An interface for Schduling Algorithm.
 2. Default scheduling is priority based.
 # Class Diagram
@@ -30,8 +34,8 @@ class ITaskSender {
 class ITaskRepository {
 	<<interface>>
 	+int DEFAULT_PRIORITY = 10
-	+initTaskSender(String name) ITaskSender
-	+initTaskSender(String name, int priority) ITaskSender
+	+registerChannel(String name) ITaskChannel
+	+registerChannel(String name, int priority) ITaskChannel
 }
 ```
 
@@ -44,14 +48,14 @@ class ITask {
 	<<interface>>
 }
 
-class ITaskSender {
+class ITaskChannel {
 	<<interface>>
 }
 
-class TaskSender {
+class TaskChannel {
 	
 }
-ITaskSender <|.. TaskSender
+ITaskChannel <|.. TaskChannel
 
 class ITaskRepository {
 	<<interface>>
@@ -59,22 +63,28 @@ class ITaskRepository {
 
 class TaskRepository {
 	<<@Service>>
-	-Map~String, TaskSender~ taskSenders
+	-Map~String, TaskChannel~ taskChannels
 	-PrioritiedTaskCache taskCache
 	-newTask(int prority, ITask task)
 	~getNewTaskPriorities() List~int~
 	~getTask(int priority) ITask
+	~buildTaskCache(int type) ITaskCache
 }
 ITaskRepository <|.. TaskRepository
-TaskRepository "1" *-- "*" ITaskSender
+TaskRepository "1" *-- "*" TaskChannel
 TaskRepository "1" *-- "1" PrioritiedTaskCache
 TaskRepository "1" *-- "1" NewTaskNotifier
-TaskRepository "1" *-- "*" ITask
+
+class ITaskCache {
+	<<interface>>
+}
 
 class PrioritiedTaskCache {
 	-Map~int, ITask~ taskBundles
 	+putTask(int priority, ITask task)
 }
+ITaskCache <|.. PrioritiedTaskCache
+PrioritiedTaskCache "1" *-- "*" ITask
 
 class ThreadManager {
 	<<@Service>>
@@ -83,6 +93,7 @@ Runnable <|.. ThreadManager
 ThreadManager "1" *-- "1" TaskRepository
 ThreadManager "1" *-- "1" IScheduling
 ThreadManager "1" *-- "*" TaskHandler
+ThreadManager "1" *-- "1" NewTaskNotifier
 
 class IScheduling {
 	<<interface>>
@@ -91,14 +102,13 @@ class IScheduling {
 IScheduling <|.. PriorityScheduling
 
 class PriorityScheduling {
-	<<@Service>>
+	+int TYPE = 1
 }
-PriorityScheduling "1" *-- "1" TaskRepository
+PriorityScheduling "1" *-- "1" PrioritiedTaskCache
 
 class NewTaskNotifier {
 	+notify()
 }
-PriorityScheduling "1" *-- "1" NewTaskNotifier
 
 class TaskHandler {
 	+setTask(ITask task): void
@@ -122,14 +132,16 @@ TaskRepository-->>-Client: sender
 sequenceDiagram
 autonumber
 
-Client->>+TaskSender: sendTask(task)
-TaskSender->>+TaskRepository: newTask(priority, task)
+Client->>+TaskChannel: putTask(task)
+TaskChannel->>+TaskRepository: newTask(priority, task)
 TaskRepository->>+PrioritiedTaskCache: putTask(priority, task)
 PrioritiedTaskCache-->>-TaskRepository: void
 TaskRepository->>+NewTaskNotifier: notify()
+NewTaskNotifier->>+ThreadManager: notify()
+ThreadManager-->>-NewTaskNotifier: void
 NewTaskNotifier-->>-TaskRepository: void
-TaskRepository-->>-TaskSender: void
-TaskSender-->>-Client: void
+TaskRepository-->>-TaskChannel: void
+TaskChannel-->>-Client: void
 ```
 ## Execute Task by Priority
 ```mermaid
@@ -152,6 +164,8 @@ TaskHandler-->>-ThreadManager: void
 * Same priority task will put in same FIFO queue.
 * Scheduling get task first from higher prority queue until the queue goes to empty then get task from lower prority queue.
 
+==BAD: It is not fair, lower priority task will be not executed if higher priority task always exists in the queue==
+
 ### Scan time based scheduling
 * Same priority task will be put in same FIFO queue.
 * All task queue has a value to record its real priority.
@@ -160,7 +174,7 @@ TaskHandler-->>-ThreadManager: void
 	* The real priority value will be decrease (-1) when the scheduling take a task from the queue.
 	* The real priority value will be increase (priority * coeficient) when the scheduling does not take any task from the queue.
 
-_BAD_: Scan all task queue and increase/decrease the real priority will consume a lot of time.
+==BAD: Scan all task queue and increase/decrease the real priority will consume a lot of time.==
 
 ### Execution time based scheduling
 * Same priority task will be put in same FIFO queue.

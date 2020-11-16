@@ -10,3 +10,4 @@ The main target of release 2 is build a resource based authentication framework,
 * [[F2.4 Behavior and action supports set attribute from behavior builder]]
 * [[F2.5 Share data in multiple behaviors]]
 * [[F2.6 Integrate resource, network and authentication framework]]
+* 2.7 [[F2.7 Status]]
