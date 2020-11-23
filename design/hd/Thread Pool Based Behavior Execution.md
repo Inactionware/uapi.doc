@@ -73,6 +73,14 @@ Thread-->>-Main Thread: void
 
 # Submodule features
 
+## Common
+
+### Support lock-free queue
+| Name | Value |
+| ------ | ------ |
+| Feature Id | 7.?? |
+| Depends | None |
+
 ## UTM
 ### Basic Thread Management
 | Name | Value |
@@ -116,7 +124,7 @@ class ITaskRepository {
 | Name | Value |
 | ------ | ------ |
 | Feature Id | 7.2 |
-| Depends | [[Thread Pool  Based Behavior Execution#Basic Thread Management]] |
+| Depends | [[Thread Pool Based Behavior Execution#Basic Thread Management]] |
 
 1. Verify `Responsible` and `Behavior` name, the reserved keywork - `:` is not allowed.
 2. Publish `Behavior` to Action Repository by name `Responsible Name::Behavior Name`.
@@ -126,7 +134,7 @@ class ITaskRepository {
 | Name | Value |
 | ------ | ------ |
 | Feature Id | 7.3 |
-| Depends | [[Thread Pool  Based Behavior Execution#Basic Thread Management]] |
+| Depends | [[Thread Pool Based Behavior Execution#Basic Thread Management]] |
 
 1. When new `Responsible` is registered, it will invoke `ITaskRepository::registerTaskBundle` to create a `TaskBundle` instance with its priority and hold it.
 2. When `Responsible` receive a new message, it will wrap the messsage to a task and add the task to `TaskBundle`.

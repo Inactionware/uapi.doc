@@ -6,7 +6,7 @@ The main target for Thread Pool is provide threads to execte `Task` by priority,
 
 | Feature | Status |
 | ------ | ------ |
-| [[Thread Pool  Based Behavior Execution#Basic Thread Management]] | Processing |
+| [[Thread Pool Based Behavior Execution#Basic Thread Management]] | Processing |
 
 # Feature List
 ## Manager Thread
@@ -16,8 +16,10 @@ The main target for Thread Pool is provide threads to execte `Task` by priority,
 ## Scheduling Algorithm
 1. An interface for Schduling Algorithm.
 2. Default scheduling is priority based.
+
 # Class Diagram
 ## Exposed APIs
+
 ```mermaid
 classDiagram
 
@@ -52,9 +54,7 @@ class ITaskChannel {
 	<<interface>>
 }
 
-class TaskChannel {
-	
-}
+class TaskChannel
 ITaskChannel <|.. TaskChannel
 
 class ITaskRepository {
@@ -115,8 +115,10 @@ class TaskHandler {
 }
 Runnable <|.. TaskHandler
 ```
+
 # Key Workflows
 ## Register
+
 ```mermaid
 sequenceDiagram
 autonumber
@@ -128,6 +130,7 @@ TaskRepository-->>-Client: sender
 ```
 
 ## Add New Incoming Task
+
 ```mermaid
 sequenceDiagram
 autonumber
@@ -143,7 +146,9 @@ NewTaskNotifier-->>-TaskRepository: void
 TaskRepository-->>-TaskChannel: void
 TaskChannel-->>-Client: void
 ```
+
 ## Execute Task by Priority
+
 ```mermaid
 sequenceDiagram
 autonumber
@@ -159,6 +164,7 @@ TaskHandler->>+Thread: notify()
 Thread-->>-TaskHandler: void
 TaskHandler-->>-ThreadManager: void
 ```
+
 ## Priority based Scheduling Algorithm
 ### Pure priority based scheduling
 * Same priority task will put in same FIFO queue.
