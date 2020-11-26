@@ -73,19 +73,23 @@ Thread-->>-Main Thread: void
 
 # Submodule features
 
-## Common
+## uapi.common
 
 ### Support lock-free queue
 | Name | Value |
 | ------ | ------ |
-| Feature Id | 7.?? |
+| Feature Id | 7.12 |
 | Depends | None |
 
-## UTM
+1. A lock-free queue implementation like ring buffer.
+2. Support multiple thread inqueue and dequeue operation.
+3. The queue capcity can be increased and decreased at run-time.
+
+## uapi.utm
 ### Basic Thread Management
 | Name | Value |
 | ------ | ------ |
-| Feature Id | 7.1 |
+| Feature Id | 7.107 |
 | Depends | None |
 
 1. A main thread is always running and is able to manager all thread in the pool.
@@ -123,7 +127,7 @@ class ITaskRepository {
 
 | Name | Value |
 | ------ | ------ |
-| Feature Id | 7.2 |
+| Feature Id | 7.104 |
 | Depends | [[Thread Pool Based Behavior Execution#Basic Thread Management]] |
 
 1. Verify `Responsible` and `Behavior` name, the reserved keywork - `:` is not allowed.
