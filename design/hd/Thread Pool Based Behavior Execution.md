@@ -81,6 +81,7 @@ Thread-->>-Main Thread: void
 | Feature Id | 7.12 |
 | Depends | None |
 
+Feature targets:
 1. A lock-free queue implementation like ring buffer.
 2. Support multiple thread inqueue and dequeue operation.
 3. The queue capcity can be increased and decreased at run-time.
