@@ -86,6 +86,23 @@ Feature targets:
 2. Support multiple thread inqueue and dequeue operation.
 3. The queue capcity can be increased and decreased at run-time.
 
+### Exposed APIs
+
+```mermaid
+classDiagram
+
+class LockFreeQueue~T~ {
+	+itemCount() int
+	+capacity() int
+	+increaseCapacity(int size) boolean
+	+decreaseCapacity(int size) boolean
+	+getItem() T
+	+getItem(int retryCount) T
+	+putItem(T item) T
+	+putItem(T item, int retryCount) T
+}
+```
+
 ## uapi.utm
 ### Basic Thread Management
 | Name | Value |

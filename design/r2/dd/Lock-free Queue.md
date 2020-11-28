@@ -10,28 +10,15 @@ The lock-free queue is CAS operation based.
 
 ## Solution Key Points
 
-1. A List is used to hold all items.
-2. Two pointers, one point the slot of the List that has item can be read, the other pointer point the slot of the List that is empty which can be write data.
-3. When get a read request, will do:
-	1. Get current read and write pointer value
-	2. Compare read and write pointer value:
-		1. If read pointer value is same as write pointer value, which means no item can be read, the read request return null
-		2. If read pointer value is less than write pointer value, will try increase read pointer value by 1:
-			1. If success to set read pointer value, will return the value of the List slot that read pointer point to
-			2. If fail to set read pointer value which means the read pointer value has been modified by other thead, need go to step 3 to retry
-4. When get a write request, will do:
-	1. Get current read and write pointer value
-	2. Compare read and write pointer value:
-		1. If read pointer value is same as write pointer value, which means the queue is empty, then try to do CAS for write pointer value:
-			1. If success, will return null to the write request caller.
-			2. If fail, needs go to step 4 to retry
-		2. If write point value is more then read pointer value, then try increase write point value by 1:
-			1. If success to set write pointer value, will set the input item to the List by the write pointer value, and then return null
-			2. If fail to set write pointer value, which mean the write pointer value has been set by other thread, needs got to step 4 to retry.
-		3. If write point value is less then read pointer value, 
-	3. Move 
-
+* A list to hold all items.
+* A read pointer, it point to the list slot which has item can be read.
+* A write pointer, it point to the list slot which can be write a new item.
+* When read pointer and write pointer point to same slot which means the slot is empty and ready to write, the read pointer can't do read operation.
+* Before write a item, it needs to check `write pos + 1 == read pos`, if true the write request can't be done. So the list capacity has one empty slot at least.
 * Using "%" operator to make read/write pointer back to start position of the List when the pointer reach to the end of the List.
+* The queue has a write lock, so to increase or decrease the queue capacity, the write lock must be set to true, then all write operation must retry until the lock is set to false.
+* To increase the capacity, the queue will create new list and move all existing item to new list, and then update write pointer and read pointer.
+* To decrease the capacity of the queue, the action should be same as increase capacity, but it needs check that if the existing item count is less than new capacity size, then the decrease operation will fail.
 
 ## Class Diagram
 
@@ -43,6 +30,7 @@ class LockFreeQueue~T~ {
 	-List~T~ items
 	-AtomicInteger readIndex
 	-AtomicInteger writeIndex
+	-AtomicBoolean writeLock
 	+LockFreeQueue(int capacity)
 	+size() int
 	+capacity() int
