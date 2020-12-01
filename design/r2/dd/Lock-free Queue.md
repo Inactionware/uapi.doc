@@ -1,6 +1,12 @@
 Lock-free Queue
 ======
 
+Version History
+
+| Feature Id | HD Link |
+| ------ | ------ |
+| F2.7.12 | [[Thread Pool Based Behavior Execution#uapi common]] |
+
 # Introduction
 
 Provides a lock-free queue to support [[Thread Pool Based Behavior Execution]]
@@ -32,7 +38,7 @@ class LockFreeQueue~T~ {
 	-AtomicInteger writeIndex
 	-AtomicBoolean writeLock
 	+LockFreeQueue(int capacity)
-	+size() int
+	+itemCount() int
 	+capacity() int
 	+increaseCapacity(int size) boolean
 	+decreaseCapacity(int size) boolean
