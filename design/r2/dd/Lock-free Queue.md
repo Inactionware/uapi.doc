@@ -40,8 +40,7 @@ class LockFreeQueue~T~ {
 	+LockFreeQueue(int capacity)
 	+itemCount() int
 	+capacity() int
-	+increaseCapacity(int size) boolean
-	+decreaseCapacity(int size) boolean
+	+setCapacity(int capacity)
 	+getItem() T
 	+getItem(int retryCount) T
 	+putItem(T item) T
