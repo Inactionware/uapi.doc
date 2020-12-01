@@ -32,10 +32,9 @@ class LockFreeQueue~T~ {
 	-AtomicInteger writeIndex
 	-AtomicBoolean writeLock
 	+LockFreeQueue(int capacity)
-	+size() int
+	+itemCount() int
 	+capacity() int
-	+increaseCapacity(int size) boolean
-	+decreaseCapacity(int size) boolean
+	+setCapacity(int capacity)
 	+getItem() T
 	+getItem(int retryCount) T
 	+putItem(T item) T
