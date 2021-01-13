@@ -91,13 +91,6 @@ Feature targets:
 ```mermaid
 classDiagram
 
-class IProfile {
-	<<interface>>
-	+getKeys() String[]
-	+getValues() Map
-	+getValue(String key) Object
-}
-
 class FastQueue~T~ {
 	+int DEFAULT_RETRY_COUNT = 10
 	+int DEFAULT_WAITING_TIME = 1
@@ -113,13 +106,24 @@ class FastQueue~T~ {
 	+putItem(T item, int retryCount, int waitingTime) T
 	+putItem(T item, int retryCount, int waitingTime, boolean increaseWaitTime) T
 }
-IProfile <|.. FastQueue
 
 class FlexibleFastQueue~T~ {
 	+setCapacity(int newCapacity) boolean
 }
-FastQueue <|-- FlexibleFastQueue
+FlexibleFastQueue "1" *-- "1..2" FastQueue
 ```
+
+---
+
+## uapi.collection (tentative)
+| Name | Value |
+| --- | --- |
+| Feature Id | 7.? |
+
+1. Provide service for `FastQueue` and `FlexibleFastQueue`.
+2. The service is `Prototype` service.
+
+---
 
 ## uapi.utm
 ### Basic Thread Management
