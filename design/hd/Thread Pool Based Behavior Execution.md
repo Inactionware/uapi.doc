@@ -13,7 +13,7 @@ Thread Pool Based Behavior Execution
 # Introduction
 For any application, thread management should be a framework level task, since the thread count should be based on hardware limitation and optimized for task execution.
 
-The UAPI framework provides `Behavior` to describe task content and `Responsible` to execute its `Behavior`, but `Responsible` has no thread to execute `Behavior`, so the `UTM` to provide thread for `Responsible` to execute `Behavior`.
+The UAPI framework provides `Behavior` to describe task content and `Responsible` to execute its `Behavior`, currently the `Behavior` framework using `Event` framework to execute `Behavior`, the `Event` framework is Java `fock-join` based, so `Responsible` has no thread to execute `Behavior` directly. So the `UTM` framework provides thread for `Responsible` to execute `Behavior`.
 
 Each `Responsible` own its task list, the task contains `Behavior` which request the corresponding `Responsible` to execute, the `Responsible` has not thread to execute these tasks.
 
@@ -21,7 +21,7 @@ The `UTM` manages a bundle thread - a thread pool, there is a system level threa
 
 # Workflow
 
-There are two ways to send mesage to `Inbox`:
+There are two ways to send message to `Inbox`:
 * Execute directly (sync way)
 * Send message (async way) ^193f80
 
@@ -84,7 +84,46 @@ Thread-->>-Main Thread: void
 Feature targets:
 1. A lock-free queue implementation like ring buffer.
 2. Support multiple thread inqueue and dequeue operation.
-3. The queue capcity can be increased and decreased at run-time.
+3. The queue capacity can be increased and decreased at run-time.
+
+### Exposed APIs
+
+```mermaid
+classDiagram
+
+class FastQueue~T~ {
+	+int DEFAULT_RETRY_COUNT = 10
+	+int DEFAULT_WAITING_TIME = 1
+	+itemCount() int
+	+capacity() int
+	+setCapacity(int capacity)
+	+getItem() T
+	+getItem(int retryCount) T
+	+getItem(int retryCount, int waitingTime) T
+	+getItem(int retryCount, int waitingTime, boolean increaseWaitingTime) T
+	+putItem(T item) T
+	+putItem(T item, int retryCount) T
+	+putItem(T item, int retryCount, int waitingTime) T
+	+putItem(T item, int retryCount, int waitingTime, boolean increaseWaitTime) T
+}
+
+class FlexibleFastQueue~T~ {
+	+setCapacity(int newCapacity) boolean
+}
+FlexibleFastQueue "1" *-- "1..2" FastQueue
+```
+
+---
+
+## uapi.collection (tentative)
+| Name | Value |
+| --- | --- |
+| Feature Id | 7.? |
+
+1. Provide service for `FastQueue` and `FlexibleFastQueue`.
+2. The service is `Prototype` service.
+
+---
 
 ## uapi.utm
 ### Basic Thread Management

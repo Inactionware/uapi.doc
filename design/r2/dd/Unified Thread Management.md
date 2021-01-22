@@ -2,7 +2,7 @@ Unified Thread Management
 ======
 
 # Introduction
-The main target for Thread Pool is provide threads to execte `Task` by priority, there is a manager thread has resposiblity to scan all `Task` in the `Task` repository.
+The main target for Thread Pool is provide threads to execute `Task` by priority, there is a manager thread has responsibility to scan all `Task` in the `Task` repository.
 
 | Feature | Status |
 | ------ | ------ |
