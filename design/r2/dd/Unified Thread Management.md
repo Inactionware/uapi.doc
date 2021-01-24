@@ -17,31 +17,10 @@ The main target for Thread Pool is provide threads to execute `Task` by priority
 1. An interface for Schduling Algorithm.
 2. Default scheduling is priority based.
 
-# Class Diagram
-## Exposed APIs
+# Implementation
 
-```mermaid
-classDiagram
-
-class ITask {
-	<<interface>>
-	+execute()
-}
-
-class ITaskSender {
-	<<interface>>
-	+sendTask(ITask task)
-}
-
-class ITaskRepository {
-	<<interface>>
-	+int DEFAULT_PRIORITY = 10
-	+registerChannel(String name) ITaskChannel
-	+registerChannel(String name, int priority) ITaskChannel
-}
-```
-
-## Implementation
+## Class Diagram
+Refer [[Thread Pool Based Behavior Execution#UTM APIs]] to see the APIs:
 
 ```mermaid
 classDiagram
@@ -114,10 +93,22 @@ class TaskHandler {
 	+setTask(ITask task): void
 }
 Runnable <|.. TaskHandler
+
+class IQueue~T~ { }
+
+class IFlexibleQueue~T~ { }
+IQueue <|-- IFlexibleQueue
+
+class FastQueue { }
+IQueue <|.. FastQueue
+
+class FlexibleFastQueue { }
+IFlexibleQueue <|.. FlexibleFastQueue
+
 ```
 
-# Key Workflows
-## Register
+## Key Workflows
+### Register
 
 ```mermaid
 sequenceDiagram
@@ -129,7 +120,7 @@ TaskSender-->>-TaskRepository: sender
 TaskRepository-->>-Client: sender
 ```
 
-## Add New Incoming Task
+### Add New Incoming Task
 
 ```mermaid
 sequenceDiagram
@@ -147,7 +138,7 @@ TaskRepository-->>-TaskChannel: void
 TaskChannel-->>-Client: void
 ```
 
-## Execute Task by Priority
+### Execute Task by Priority
 
 ```mermaid
 sequenceDiagram

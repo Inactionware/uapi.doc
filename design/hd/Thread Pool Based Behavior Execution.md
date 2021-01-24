@@ -75,6 +75,8 @@ Thread-->>-Main Thread: void
 
 ## uapi.common
 
+Note: The feature of this submodule was moved to `uapi.utm` module.
+
 ### Support lock-free queue
 | Name | Value |
 | ------ | ------ |
@@ -115,16 +117,6 @@ FlexibleFastQueue "1" *-- "1..2" FastQueue
 
 ---
 
-## uapi.collection (tentative)
-| Name | Value |
-| --- | --- |
-| Feature Id | 7.? |
-
-1. Provide service for `FastQueue` and `FlexibleFastQueue`.
-2. The service is `Prototype` service.
-
----
-
 ## uapi.utm
 ### Basic Thread Management
 | Name | Value |
@@ -138,7 +130,7 @@ FlexibleFastQueue "1" *-- "1..2" FastQueue
 5. The main thread scans task repository cache to get new task.
 6. The thread scheduling algorithm should be abstructed to a common interface that can be easy to extend.
 
-### Exposed APIs
+### UTM APIs
 
 ```mermaid
 classDiagram
@@ -159,6 +151,27 @@ class ITaskRepository {
 	+registerTaskChannel(String name) ITaskChannel
 	+registerTaskChannel(String name, int priority) ITaskChannel
 }
+
+class IQueue~T~ {
+	<<interface>>
+	+itemCount() int
+	+capacity() int
+	+setCapacity(int capacity)
+	+getItem() T
+	+getItem(int retryCount) T
+	+getItem(int retryCount, int waitingTime) T
+	+getItem(int retryCount, int waitingTime, boolean increaseWaitingTime) T
+	+putItem(T item) T
+	+putItem(T item, int retryCount) T
+	+putItem(T item, int retryCount, int waitingTime) T
+	+putItem(T item, int retryCount, int waitingTime, boolean increaseWaitTime) T
+}
+
+class IFlexibleQueue~T~ {
+	<<interface>>
+	+setCapacity(int newCapacity) boolean
+}
+IQueue <|-- IFlexibleQueue
 ```
 
 ## Behavior Framework Features
