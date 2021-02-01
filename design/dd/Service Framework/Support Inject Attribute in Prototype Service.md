@@ -32,4 +32,39 @@ public class HostService {
 }
 ```
 
-The 
+The framework generate `getDependencies()` method based on `@Inject` annotation, to support `@Injectattribute` annotation, we need create new class extends `Dependency`:
+
+```java
+public class Dependency {
+
+	...
+	private Map<String, String> _attributes;
+	
+	...
+	public void addAttribute(String name, String value) {
+		this._attributes.put(name, value);
+	}
+}
+```
+
+In `Registry:initInstanceAttributes(ServiceHolder hostSvc)` method, we need retrieve the attribute name and value from `Dependency` from the `hostSvc`.
+
+The attribute value supports literal value and reference value, the reference value is constructed by `parser name:reference value`, the parser name identify which parser can parse the reference value.
+
+To support attribute value parser, currently the `ISatisfyHook` need support attribute value parser, so its name should changed.
+
+```java
+public interface IServiceSupport {
+
+	ISatisfyHook satisfyHook();
+	
+	IAttributeParser attributeParser();
+}
+
+public interface IAttributeParser {
+
+	String name();
+	
+	ConfigObject parse(String value);
+}
+```
