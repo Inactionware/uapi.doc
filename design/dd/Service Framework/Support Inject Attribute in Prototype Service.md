@@ -11,14 +11,14 @@ The idea is we have to retrieve all required attributes before the creation of t
 
 # Implementation
 
-Add new annotation named `@InjectAttribute`:
+Add new annotation named `@InitAttribute`:
 
 ```java
 @Service
 public class PrototypeService {
 
 	@Attribute("attribute")
-	protected _attribute;
+	protected int _attribute;
 	
 	...
 }
@@ -27,12 +27,12 @@ public class PrototypeService {
 public class HostService {
 	
 	@Inject
-	@InjectAttribute(name="attribute" value="config:HostService.attribute")
+	@InitAttribute(name="attribute" value="config:HostService.attribute")
 	protected PrototypeService _prototypeService;
 }
 ```
 
-The framework generate `getDependencies()` method based on `@Inject` annotation, to support `@Injectattribute` annotation, we need create new class extends `Dependency`:
+The framework generate `getDependencies()` method based on `@Inject` annotation, to support `@InitAttribute` annotation, we need create new class extends `Dependency`:
 
 ```java
 public class Dependency {
@@ -41,7 +41,7 @@ public class Dependency {
 	private Map<String, String> _attributes;
 	
 	...
-	public void addAttribute(String name, String value) {
+	public void addAttribute(String name, String value, String type) {
 		this._attributes.put(name, value);
 	}
 }
@@ -51,7 +51,7 @@ In `Registry:initInstanceAttributes(ServiceHolder hostSvc)` method, we need retr
 
 The attribute value supports literal value and reference value, the reference value is constructed by `parser name:reference value`, the parser name identify which parser can parse the reference value.
 
-To support attribute value parser, currently the `ISatisfyHook` need support attribute value parser, so its name should changed.
+To support attribute value parser, currently the `ISatisfyHook` needs support attribute value parser, so its name should changed.
 
 ```java
 public interface IServiceSupport {
@@ -65,6 +65,6 @@ public interface IAttributeParser {
 
 	String name();
 	
-	ConfigObject parse(String value);
+	Object parse(String value);
 }
 ```
