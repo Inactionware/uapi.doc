@@ -13,19 +13,26 @@ To inject attribute to a Prototype Service, the Service Framework introduce an a
 classDiagram
 
 class ConfigAttributeParser {
-	
+	<<Service>>
 }
 IAttributeParser <.. ConfigAttributeParser
 
 class ConfigurationSupport {
+	<<Service>>
 	-_rootConfiguration Configuration
 }
 IServiceSupport <.. ConfigurationSupport
 ConfigurationSupport "1" *-- "1" ConfigAttributeParser
+ConfigurationSupport "1" *-- "1" ConfigValueParsers
 ConfigurationSupport "1" *-- "1" ConfigSatisfyHook
 
+class ConfigValueParsers {
+	<<Service>>
+}
+ConfigValueParsers "1" *-- "*" IConfigValueParser
+
 class ConfigSatisfyHook {
-	
+	<<Service>>
 }
 ISatisfyHook <.. ConfigSatisfyHook
 ```

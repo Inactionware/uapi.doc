@@ -100,7 +100,7 @@ class IServiceSupport {
 
 class IAttributeParser {
 	name() String
-	parse(String value) Object
+	parse(String value, String targetType) Object
 }
 ```
 
