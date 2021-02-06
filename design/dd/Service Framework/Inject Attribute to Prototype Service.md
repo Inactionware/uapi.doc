@@ -49,21 +49,6 @@ public class Dependency {
 }
 ```
 
-#### Multiple Value Object API
-
-To support multiple value, we will create new utilization class in the `uapi.common` project:
-
-```mermaid
-classDiagram
-
-class Multivalued {
-	-Object[] _values
-	
-	+MultipleValue(int size)
-	+getValue(int index) T
-}
-```
-
 #### Class for Attribute holding
 
 ```mermaid
@@ -76,7 +61,7 @@ class Attribute {
 	+type() String
 	+isReferenceValue() boolean
 }
-Multivalued <-- Attribute
+Multivariate <-- Attribute
 ```
 
 ### Parse and Inject Attributes
