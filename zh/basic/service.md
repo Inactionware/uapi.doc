@@ -300,6 +300,29 @@ public class ListenHttpPort {
 
 在`ListenHttpPort`服务中，我们通过配置获取了要侦听的地址和端口，然后初始化属性Map，将该属性Map作为参数从`IRegistry`中获取新的原型服务实例。
 
+在特性2.7.1中，我们为原型服务提供了属性注入的功能，使用`InjectAttribute`就可以为指定的原型服务注入属性了：
+
+```java
+@Service
+@Action
+public class ListenHttpPort {
+
+    public static final ActionIdentify actionId = ActionIdentify.toActionId(ListenHttpPort.class);
+	
+	@Inject
+	@InjectAttribute(name=HttpAttributes.HOST, value="config:server.host")
+	@InjectAttribute(name=HttpAttributes.PORT, value="config:server.port")
+	protected IHttpListener _httpListener;
+
+    @ActionDo
+    public void run(Object input) {
+        this._httpListener.startUp();
+    }
+}
+```
+
+使用这种方式可以节省很多代码而且也无需依赖`IRegistry`类了。
+
 ## 通过方法注入服务
 使用`Inject`注解不仅可以声明在类字段中注入服务，也可以在方法上声明，指明在注入发生的时候使用该方法来注入，通常如果我们做一些额外的逻辑的时候就可以使用方法注入，例如：
 ```java
