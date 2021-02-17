@@ -1,8 +1,6 @@
 Development Notes
 =================
 
-[[toc]]
-
 ## How to start new feature/issue development?
 
 * In `project repo`, create a new branch for new feature development project, the branch name likes "feature/xxx" or "bugfix/xxx".
